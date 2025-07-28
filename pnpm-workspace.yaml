@@ -1,0 +1,7 @@
+# fundit-dapp/pnpm-workspace.yaml
+packages:
+  - "contracts"
+  - "backend"
+  - "app"
+  - "shared"
+  - "scripts"
