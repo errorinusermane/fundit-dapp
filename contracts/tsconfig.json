@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "types": ["hardhat"]
+  },
+  "include": ["./scripts", "./test"] // ✅ 여기도 있으면 좋음!
+}

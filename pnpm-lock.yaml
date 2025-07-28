@@ -7,10 +7,26 @@ settings:
 importers:
 
   .:
+    dependencies:
+      ethers:
+        specifier: ^6.15.0
+        version: 6.15.0
     devDependencies:
+      '@nomicfoundation/hardhat-toolbox':
+        specifier: ^6.1.0
+        version: 6.1.0(2c66f060a4ec409e71611f8805c7cfb2)
+      '@openzeppelin/contracts':
+        specifier: ^5.4.0
+        version: 5.4.0
+      '@types/node':
+        specifier: ^24.1.0
+        version: 24.1.0
       eslint:
         specifier: ^9.32.0
         version: 9.32.0
+      hardhat:
+        specifier: ^2.26.1
+        version: 2.26.1(ts-node@10.9.2(@types/node@24.1.0)(typescript@5.8.3))(typescript@5.8.3)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
@@ -410,6 +426,9 @@ packages:
   '@nomicfoundation/solidity-analyzer@0.1.2':
     resolution: {integrity: sha512-q4n32/FNKIhQ3zQGGw5CvPF6GTvDCpYwIf7bEY/dZTZbgfDsHyjJwURxUJf3VQuuJj+fDIFl4+KkBVbw4Ef6jA==}
     engines: {node: '>= 12'}
+
+  '@openzeppelin/contracts@5.4.0':
+    resolution: {integrity: sha512-eCYgWnLg6WO+X52I16TZt8uEjbtdkgLC0SUX/xnAksjjrQI4Xfn4iBRoI5j55dmlOhDv1Y7BoR3cU7e3WWhC6A==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -2969,6 +2988,8 @@ snapshots:
       '@nomicfoundation/solidity-analyzer-linux-x64-gnu': 0.1.2
       '@nomicfoundation/solidity-analyzer-linux-x64-musl': 0.1.2
       '@nomicfoundation/solidity-analyzer-win32-x64-msvc': 0.1.2
+
+  '@openzeppelin/contracts@5.4.0': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

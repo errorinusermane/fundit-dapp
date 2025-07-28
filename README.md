@@ -86,8 +86,10 @@ source ~/.zshrc
 nvm use 20
 
 # clean 필수!!
+# 1. 컴파일, sol 배포는 루트에서
 npx hardhat clean
 npx hardhat compile
+npx hardhat run scripts/deploy.ts --network hardhat
 
 # =============================================== #
 
@@ -96,7 +98,6 @@ npx hardhat compile
 - 초기설정 진행. .eslintrc, .prettierrc, tsconfig, .gitignore
 - 초기화 진행
 -- cd ..
-cd contracts
 pnpm init
 pnpm add -D hardhat @nomicfoundation/hardhat-toolbox
 npx hardhat
