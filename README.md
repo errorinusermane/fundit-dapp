@@ -90,7 +90,10 @@ nvm use 20
 # 1. 따라서 sol 관련 pnpm 같은 거 설치할 때 전부 루트에서!
 npx hardhat clean
 npx hardhat compile
+# 아래는 하드햇 배포
 npx hardhat run scripts/deploy.ts --network hardhat
+# 아래는 진짜 돈 나가는 메인넷 배포
+npx hardhat run scripts/deploy.ts --network bsc
 
 # =============================================== #
 
