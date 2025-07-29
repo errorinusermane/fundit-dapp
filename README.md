@@ -118,3 +118,7 @@ rm -rf node_modules package-lock.json
 pnpm install
 pnpm add axios
 
+# 맥북 사용으로 인해 모든 연결을 네트워크 IP 기반으로 빌드
+1. ipconfig getifaddr en0
+2. backend/server.ts 에서 0.0.0.0로 설정
+3. app/api/axios.ts 에서 맥북 IP로 설정
