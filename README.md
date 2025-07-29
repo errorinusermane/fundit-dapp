@@ -87,6 +87,7 @@ nvm use 20
 
 # clean 필수!!
 # 1. 컴파일, sol 배포는 루트에서
+# 1. 따라서 sol 관련 pnpm 같은 거 설치할 때 전부 루트에서!
 npx hardhat clean
 npx hardhat compile
 npx hardhat run scripts/deploy.ts --network hardhat
