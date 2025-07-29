@@ -92,6 +92,9 @@ npx hardhat clean
 npx hardhat compile
 # 아래는 하드햇 배포
 npx hardhat run scripts/deploy.ts --network hardhat
+npx hardhat node
+npx hardhat run scripts/deploy.ts --network localhost
+
 # 아래는 진짜 돈 나가는 메인넷 배포
 npx hardhat run scripts/deploy.ts --network bsc
 

@@ -1,15 +1,17 @@
+// /tsconfig.json(루트에 위치함)
 {
   "compilerOptions": {
     "target": "ES2020",
     "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "baseUrl": ".", // 루트 기준
     "paths": {
-      "@shared/*": ["shared/*"]
+      "@shared/*": ["shared/*"],
+      "@utils/*": ["backend/utils/*"]
     }
   },
-  "include": ["backend", "contracts", "scripts", "shared"]
+  "include": ["backend", "shared"]
 }
