@@ -9,22 +9,34 @@ contract FunditToken is ERC20, Ownable {
 
     event MinterUpdated(address indexed oldMinter, address indexed newMinter);
 
-    constructor() ERC20("Fundit Token", "FDT") Ownable(msg.sender) {
-        _mint(msg.sender, 1_000_000 * 10 ** decimals());
-        
+    struct RewardEvent {
+        uint256 amount;
+        uint256 timestamp;
     }
 
-    /// @notice 리워드 지급 가능 주소 지정 (예: Oracle 또는 Contract)
+    mapping(address => RewardEvent[]) public rewardHistory;
+
+    constructor() ERC20("Fundit Token", "FDT") Ownable(msg.sender) {
+        _mint(msg.sender, 1_000_000 * 10 ** decimals());
+    }
+
     function setMinter(address _minter) external onlyOwner {
         emit MinterUpdated(minter, _minter);
         minter = _minter;
     }
 
-    /// @notice 리워드 지급 (minter만 가능)
     function mintReward(address to, uint256 amount) external {
         require(msg.sender == minter, "Only minter can mint");
         _mint(to, amount);
+        rewardHistory[to].push(RewardEvent(amount, block.timestamp));
     }
 
-    /// @notice 일반 ERC20 transfer 등은 기본 상속된 기능 사용
+    function getRewardHistoryLength(address user) external view returns (uint256) {
+        return rewardHistory[user].length;
+    }
+
+    function getRewardHistoryItem(address user, uint256 index) external view returns (uint256 amount, uint256 timestamp) {
+        RewardEvent memory evt = rewardHistory[user][index];
+        return (evt.amount, evt.timestamp);
+    }
 }

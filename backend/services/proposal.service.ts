@@ -33,5 +33,48 @@ export const getAllProposals = async (): Promise<Proposal[]> => {
     args: [],
   });
 
-  return proposals as Proposal[]; // ✅ 여기 위치!
+  return proposals as Proposal[];
+};
+
+export const getProposalById = async (proposalId: bigint): Promise<Proposal> => {
+  const proposal = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getProposalById",
+    args: [proposalId],
+  });
+  return proposal as Proposal;
+};
+
+export const getProposalsByUser = async (userAddress: string): Promise<Proposal[]> => {
+  const proposals = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getProposalsByUser",
+    args: [userAddress],
+  });
+  return proposals as Proposal[];
+};
+
+export const getActiveProposals = async (): Promise<Proposal[]> => {
+  const proposals = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getActiveProposals",
+    args: [],
+  });
+  return proposals as Proposal[];
+};
+
+export const closeProposal = async (proposalId: bigint): Promise<string> => {
+  const { request } = await publicClient.simulateContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "closeProposal",
+    args: [proposalId],
+    account: walletClient.account,
+  });
+
+  const txHash = await walletClient.writeContract(request);
+  return txHash;
 };
