@@ -3,6 +3,7 @@ import {
   submitBid,
   getBidsByProposal,
   selectBid,
+  getBidsByCompany,
 } from "../services/bid.service";
 
 const router = express.Router();
@@ -68,6 +69,26 @@ router.post("/select", async (req, res) => {
     res.status(200).json({ txHash });
   } catch (err: any) {
     console.error("❌ Error in POST /bids/select:", err);
+    res.status(500).json({ error: err.message || "Internal server error" });
+  }
+});
+
+/**
+ * GET /bids/company/:address
+ * 특정 회사(address)의 모든 입찰 조회
+ */
+router.get("/company/:address", async (req, res) => {
+  try {
+    const { address } = req.params;
+
+    if (!address) {
+      return res.status(400).json({ error: "Company address is required." });
+    }
+
+    const bids = await getBidsByCompany(address);
+    res.status(200).json(bids);
+  } catch (err: any) {
+    console.error("❌ Error in GET /bids/company/:address:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
   }
 });

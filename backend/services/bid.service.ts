@@ -4,6 +4,7 @@ import { publicClient, walletClient } from "../utils/client";
 import { CONTRACT_ADDRESSES } from "@shared/constants";
 import FunditBidArtifact from "@shared/abi/FunditBid.json";
 import { Bid } from "@shared/types/bid";
+import { getAllProposals } from "./proposal.service";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditBid as `0x${string}`;
 const contractAbi = FunditBidArtifact.abi as readonly unknown[];
@@ -52,4 +53,19 @@ export async function selectBid(bidId: bigint) {
   });
 
   return txHash;
+}
+
+// 특정 기업이 제출한 모든 입찰 조회
+export async function getBidsByCompany(companyAddress: string): Promise<Bid[]> {
+  const proposals = await getAllProposals(); // 모든 proposal 가져오기
+
+  const bidsByCompany: Bid[] = [];
+
+  for (const proposal of proposals) {
+    const bids = await getBidsByProposal(BigInt(proposal.id));
+    const myBids = bids.filter((bid) => bid.bidder.toLowerCase() === companyAddress.toLowerCase());
+    bidsByCompany.push(...myBids);
+  }
+
+  return bidsByCompany;
 }
