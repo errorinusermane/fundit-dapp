@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../common";
+} from "../../common";
 
 export declare namespace FunditContract {
   export type InsuranceContractStruct = {
@@ -65,9 +65,10 @@ export declare namespace FunditContract {
 export interface FunditContractInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "bidContract"
       | "cancelContract"
       | "completeContract"
-      | "confirmContract"
+      | "confirmContractIfPopular"
       | "contractCount"
       | "contracts"
       | "contractsByCompany"
@@ -75,10 +76,16 @@ export interface FunditContractInterface extends Interface {
       | "getContract"
       | "getContractsByCompany"
       | "getContractsByUser"
+      | "hasJoined"
+      | "voteThreshold"
   ): FunctionFragment;
 
   getEvent(nameOrSignatureOrTopic: "ContractConfirmed"): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "bidContract",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "cancelContract",
     values: [BigNumberish]
@@ -88,16 +95,8 @@ export interface FunditContractInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "confirmContract",
-    values: [
-      BigNumberish,
-      BigNumberish,
-      AddressLike,
-      AddressLike,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish
-    ]
+    functionFragment: "confirmContractIfPopular",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "contractCount",
@@ -127,7 +126,19 @@ export interface FunditContractInterface extends Interface {
     functionFragment: "getContractsByUser",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "hasJoined",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "voteThreshold",
+    values?: undefined
+  ): string;
 
+  decodeFunctionResult(
+    functionFragment: "bidContract",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "cancelContract",
     data: BytesLike
@@ -137,7 +148,7 @@ export interface FunditContractInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "confirmContract",
+    functionFragment: "confirmContractIfPopular",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -163,6 +174,11 @@ export interface FunditContractInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getContractsByUser",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "hasJoined", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "voteThreshold",
     data: BytesLike
   ): Result;
 }
@@ -244,6 +260,8 @@ export interface FunditContract extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  bidContract: TypedContractMethod<[], [string], "view">;
+
   cancelContract: TypedContractMethod<
     [contractId: BigNumberish],
     [void],
@@ -256,16 +274,8 @@ export interface FunditContract extends BaseContract {
     "nonpayable"
   >;
 
-  confirmContract: TypedContractMethod<
-    [
-      proposalId: BigNumberish,
-      bidId: BigNumberish,
-      user: AddressLike,
-      company: AddressLike,
-      coverageAmount: BigNumberish,
-      premiumAmount: BigNumberish,
-      duration: BigNumberish
-    ],
+  confirmContractIfPopular: TypedContractMethod<
+    [bidId: BigNumberish, duration: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -332,10 +342,21 @@ export interface FunditContract extends BaseContract {
     "view"
   >;
 
+  hasJoined: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [boolean],
+    "view"
+  >;
+
+  voteThreshold: TypedContractMethod<[], [bigint], "view">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "bidContract"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "cancelContract"
   ): TypedContractMethod<[contractId: BigNumberish], [void], "nonpayable">;
@@ -343,17 +364,9 @@ export interface FunditContract extends BaseContract {
     nameOrSignature: "completeContract"
   ): TypedContractMethod<[contractId: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "confirmContract"
+    nameOrSignature: "confirmContractIfPopular"
   ): TypedContractMethod<
-    [
-      proposalId: BigNumberish,
-      bidId: BigNumberish,
-      user: AddressLike,
-      company: AddressLike,
-      coverageAmount: BigNumberish,
-      premiumAmount: BigNumberish,
-      duration: BigNumberish
-    ],
+    [bidId: BigNumberish, duration: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -426,6 +439,16 @@ export interface FunditContract extends BaseContract {
     [FunditContract.InsuranceContractStructOutput[]],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "hasJoined"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "voteThreshold"
+  ): TypedContractMethod<[], [bigint], "view">;
 
   getEvent(
     key: "ContractConfirmed"

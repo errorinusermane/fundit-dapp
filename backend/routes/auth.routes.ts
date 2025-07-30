@@ -4,11 +4,14 @@ import {
   verifyMagicToken,
   connectWallet,
 } from "../services/auth.service";
-import { generateToken } from "../utils/jwt";
+import { generateToken, UserRole } from "../utils/jwt"; // 🔁 UserRole import
 
 const router = express.Router();
 
-// ✅ POST /auth/login
+/**
+ * POST /auth/login
+ * 이메일과 역할(user | company)을 받아 magic link 발송
+ */
 router.post("/login", async (req, res) => {
   const { email, role } = req.body;
 
@@ -19,7 +22,7 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    await requestMagicLink(email, role);
+    await requestMagicLink(email, role as UserRole);
     res.status(200).json({ message: "📧 Magic link sent to your email." });
   } catch (err) {
     console.error("❌ Error sending magic link:", err);
@@ -27,7 +30,10 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ✅ GET /auth/verify?token=...
+/**
+ * GET /auth/verify?token=...
+ * magic link를 통한 토큰 검증 → user 정보 + 최종 JWT 발급
+ */
 router.get("/verify", async (req, res) => {
   const { token } = req.query;
 
@@ -38,8 +44,7 @@ router.get("/verify", async (req, res) => {
   try {
     const payload = await verifyMagicToken(token); // { email, role, wallet }
 
-    // 최종 JWT 발급 (지갑이 연결되지 않았으면 wallet은 "")
-    const finalToken = generateToken(payload);
+    const finalToken = generateToken(payload); // 지갑 연결 여부 포함한 JWT 발급
 
     res.status(200).json({
       message: "✅ 인증 성공",
@@ -52,7 +57,10 @@ router.get("/verify", async (req, res) => {
   }
 });
 
-// ✅ PATCH /auth/wallet
+/**
+ * PATCH /auth/wallet
+ * 지갑 주소 연결 → 연결된 wallet 주소 기반 JWT 재발급
+ */
 router.patch("/wallet", async (req, res) => {
   const { email, wallet } = req.body;
 
@@ -63,10 +71,9 @@ router.patch("/wallet", async (req, res) => {
   try {
     const updated = await connectWallet(email, wallet);
 
-    // 👇 새 JWT 발급
     const newToken = generateToken({
       email: updated.email,
-      role: updated.role,
+      role: updated.role as UserRole,
       wallet: updated.id,
     });
 
@@ -84,6 +91,5 @@ router.patch("/wallet", async (req, res) => {
     res.status(500).json({ error: "지갑 연결 중 오류가 발생했습니다." });
   }
 });
-
 
 export default router;
