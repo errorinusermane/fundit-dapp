@@ -1,3 +1,4 @@
+// /shared/types/oracle.ts
 // 오라클 상태 enum (Solidity enum과 일치)
 export enum OracleVerificationStatus {
   Pending = 0,

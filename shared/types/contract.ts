@@ -1,3 +1,4 @@
+//shared/types/contract.ts
 export interface Contract {
   id: number;
   proposalId: number;
