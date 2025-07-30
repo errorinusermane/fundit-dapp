@@ -1,15 +1,102 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id                      // 지갑 주소 (0x...)
+  email        String     @unique
+  role         Role
+  createdAt    DateTime   @default(now())
+  lastLoginAt  DateTime?  @updatedAt
+
+  proposals    Proposal[] @relation("UserProposals")
+  bids         Bid[]      @relation("UserBids")
+  contracts    Contract[] @relation("UserContracts")
+  companyAs    Contract[] @relation("CompanyContracts")
+
+  rewards      RewardEvent[]
+}
+
+enum Role {
+  user
+  company
+}
+
+model Proposal {
+  id             BigInt   @id
+  proposer       String
+  title          String
+  description    String
+  coverageAmount BigInt
+  premium        BigInt
+  deadline       BigInt
+  bids           Bid[]
+  contract       Contract?
+
+  user           User     @relation("UserProposals", fields: [proposer], references: [id])
+}
+
+model Bid {
+  id            Int      @id @default(autoincrement())
+  proposalId    BigInt
+  bidder        String
+  coverageOffer BigInt
+  premiumOffer  BigInt
+  timestamp     BigInt
+
+  proposal      Proposal @relation(fields: [proposalId], references: [id])
+  user          User     @relation("UserBids", fields: [bidder], references: [id])
+  contract      Contract?
+}
+
+model Contract {
+  id             Int     @id @default(autoincrement())
+  proposalId     BigInt  @unique
+  bidId          Int     @unique
+  userId         String
+  companyId      String
+  coverageAmount BigInt
+  premium        BigInt
+  startDate      Int
+  endDate        Int
+  nextPaymentDue Int
+  autoPayment    Boolean
+
+  proposal       Proposal @relation(fields: [proposalId], references: [id])
+  bid            Bid      @relation(fields: [bidId], references: [id])
+  user           User     @relation("UserContracts", fields: [userId], references: [id])
+  company        User     @relation("CompanyContracts", fields: [companyId], references: [id])
+
+  verificationRequests VerificationRequest[]
+}
+
+enum OracleVerificationStatus {
+  Pending   // 0
+  Approved  // 1
+  Rejected  // 2
+}
+
+model VerificationRequest {
+  id           Int                      @id @default(autoincrement())
+  contractId   Int                      // 해당 계약 ID
+  requester    String                   // 요청자 주소
+  evidenceHash String
+  status       OracleVerificationStatus
+  timestamp    BigInt
+
+  contract     Contract                 @relation(fields: [contractId], references: [id])
+}
+
+model RewardEvent {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  amount    BigInt
+  timestamp BigInt
+
+  user      User     @relation(fields: [userId], references: [id])
 }

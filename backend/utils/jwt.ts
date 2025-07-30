@@ -8,7 +8,7 @@ const JWT_EXPIRES_IN = "15m"; // 15분 유효 (magic link 인증용)
 
 interface TokenPayload {
   email: string;
-  role: "user" | "company";
+  role: "user" | "company" | "admin";
   wallet: string;
 }
 

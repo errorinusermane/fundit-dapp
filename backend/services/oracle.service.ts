@@ -11,7 +11,7 @@ const contractAddress = CONTRACT_ADDRESSES.FunditOracle as `0x${string}`;
 const contractAbi = FunditOracleArtifact.abi as readonly unknown[];
 
 /**
- * 보험금 청구 전 오라클 검증 요청
+ * ✅ 오라클 검증 요청
  */
 export async function requestVerification({
   contractId,
@@ -30,7 +30,7 @@ export async function requestVerification({
 }
 
 /**
- * 오라클 상태 조회
+ * ✅ 오라클 상태 조회
  */
 export async function getOracleStatus(contractId: bigint): Promise<OracleVerificationStatus> {
   const status = await publicClient.readContract({
@@ -40,29 +40,36 @@ export async function getOracleStatus(contractId: bigint): Promise<OracleVerific
     args: [contractId],
   });
 
-  return status as OracleVerificationStatus;
+  return Number(status) as OracleVerificationStatus; // 혹시 모를 타입 오류 방지
 }
 
 /**
- * 오라클 결과 등록 (관리자만 호출 가능)
+ * ✅ 오라클 결과 반영 (관리자만 호출 가능)
  */
 export async function resolveClaim({
   contractId,
   isApproved,
 }: ResolveClaimParams): Promise<string> {
-  // 먼저 해당 contractId에 대한 requestId를 조회해야 함
-  const requestId = await publicClient.readContract({
+  // requestId 조회
+  const requestIdRaw = await publicClient.readContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "requestByContract",
     args: [contractId],
   });
 
+  const requestId = BigInt(requestIdRaw as string | number | bigint);
+
+  // 예외 처리 (0이면 없는 request라고 판단)
+  if (requestId === 0n) {
+    throw new Error(`해당 contractId(${contractId})에 대한 검증 요청이 없습니다.`);
+  }
+
   const { request } = await publicClient.simulateContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "verifyClaim",
-    args: [requestId as bigint, isApproved],
+    args: [requestId, isApproved],
     account: walletClient.account,
   });
 

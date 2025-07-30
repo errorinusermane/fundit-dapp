@@ -8,7 +8,8 @@ export enum OracleVerificationStatus {
 
 // Verification 요청 구조체 (Solidity 기준 맞춤)
 export interface VerificationRequest {
-  contractId: bigint;
+  id: number;
+  contractId: number;
   requester: string;
   evidenceHash: string;
   status: OracleVerificationStatus;
@@ -25,3 +26,4 @@ export interface ResolveClaimParams {
   contractId: bigint;
   isApproved: boolean;
 }
+

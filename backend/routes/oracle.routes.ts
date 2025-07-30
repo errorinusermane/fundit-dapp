@@ -4,11 +4,12 @@ import {
   getOracleStatus,
   resolveClaim,
 } from "../services/oracle.service";
+import { authenticateJWT } from "../middleware/auth.middleware"; // ✅ 인증 미들웨어 추가
 
 const router = express.Router();
 
 /**
- * POST /oracle/verify
+ * ✅ POST /oracle/verify
  * 오라클 검증 요청 (evidenceHash는 off-chain 데이터를 참조하는 IPFS 해시 등)
  */
 router.post("/verify", async (req, res) => {
@@ -32,7 +33,7 @@ router.post("/verify", async (req, res) => {
 });
 
 /**
- * GET /oracle/status/:contractId
+ * ✅ GET /oracle/status/:contractId
  * 오라클 검증 상태 조회
  */
 router.get("/status/:contractId", async (req, res) => {
@@ -40,7 +41,17 @@ router.get("/status/:contractId", async (req, res) => {
     const contractId = BigInt(req.params.contractId);
     const status = await getOracleStatus(contractId);
 
-    res.status(200).json({ status });
+    // 상태코드 → 문자열 매핑
+    const statusMap = {
+      0: "Pending",
+      1: "Approved",
+      2: "Rejected",
+    };
+
+    res.status(200).json({
+      status: statusMap[status as 0 | 1 | 2],
+      code: status,
+    });
   } catch (err: any) {
     console.error("❌ Error in GET /oracle/status:", err);
     res.status(500).json({ error: err.message || "Internal server error" });
@@ -48,11 +59,16 @@ router.get("/status/:contractId", async (req, res) => {
 });
 
 /**
- * POST /oracle/resolve
+ * ✅ POST /oracle/resolve
  * 오라클 결과 반영 (관리자만 호출)
  */
-router.post("/resolve", async (req, res) => {
+router.post("/resolve", authenticateJWT, async (req, res) => {
   try {
+    // ✅ 관리자 권한 확인
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "관리자 권한이 필요합니다." });
+    }
+
     const { contractId, isApproved } = req.body;
 
     if (typeof contractId === "undefined" || typeof isApproved === "undefined") {

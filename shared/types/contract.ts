@@ -1,18 +1,24 @@
-//shared/types/contract.ts
+import { VerificationRequest } from "./oracle";
+
+// shared/types/contract.ts
 export interface Contract {
   id: number;
   proposalId: number;
   bidId: number;
-  user: string; // 보험 제안자
-  company: string; // 입찰자
+  user: string;      // = userId
+  company: string;   // = companyId
   coverageAmount: bigint;
   premium: bigint;
-  startDate: number; // timestamp
-  endDate: number; // timestamp
+  startDate: number;      // timestamp
+  endDate: number;        // timestamp
   nextPaymentDue: number; // timestamp
   autoPayment: boolean;
+
+  // ✅ 추가: 오라클 요청 내역 (선택적 필드)
+  verificationRequests?: VerificationRequest[];
 }
 
+// 필요 시 확장
 export interface ContractDetail extends Contract {
-  status: "ACTIVE" | "EXPIRED" | "CANCELLED"; // 필요 시 상태 확장
+  status: "ACTIVE" | "EXPIRED" | "CANCELLED";
 }

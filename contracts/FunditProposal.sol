@@ -25,6 +25,8 @@ contract FunditProposal {
         uint256 deadline
     );
 
+    event ProposalClosed(uint256 indexed id, uint256 closedAt); // ✅ 마감 이벤트 추가
+
     function createProposal(
         string memory _title,
         string memory _description,
@@ -64,5 +66,15 @@ contract FunditProposal {
             result[i - 1] = proposals[i];
         }
         return result;
+    }
+
+    // ✅ 제안 마감 함수 추가
+    function closeProposal(uint256 _id) external {
+        Proposal storage p = proposals[_id];
+        require(msg.sender == p.proposer, "Only proposer can close");
+        require(block.timestamp < p.deadline, "Already closed");
+
+        p.deadline = block.timestamp; // 마감 처리
+        emit ProposalClosed(_id, block.timestamp);
     }
 }

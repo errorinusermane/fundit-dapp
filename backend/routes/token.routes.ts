@@ -7,6 +7,7 @@ import {
   getRewardHistoryLength,
   getRewardHistoryItem,
 } from "../services/token.service";
+import prisma from "@utils/prisma";
 
 const router = express.Router();
 
@@ -46,7 +47,18 @@ router.post("/claim", async (req, res) => {
       return res.status(400).json({ error: "Missing 'address' or 'amount'" });
     }
 
+    // ① 온체인 리워드 전송
     const txHash = await claimReward(address, amount);
+
+    // ② DB에도 기록
+    await prisma.rewardEvent.create({
+      data: {
+        userId: address,
+        amount: BigInt(amount),
+        timestamp: BigInt(Math.floor(Date.now() / 1000)),
+      },
+    });
+
     res.json({ txHash });
   } catch (err: any) {
     console.error("❌ POST /token/claim error:", err);
