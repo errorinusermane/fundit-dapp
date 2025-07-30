@@ -15,6 +15,8 @@ contract FunditBid {
 
     mapping(uint256 => Bid) public bids; // bidId → Bid
     mapping(uint256 => uint256[]) public bidsByProposal; // proposalId → bidIds
+    mapping(uint256 => uint256) public bidVoteCounts; // bidId → 투표 수
+    mapping(address => mapping(uint256 => bool)) public hasVoted; // user → bidId → 중복 방지
 
     event BidSubmitted(
         uint256 indexed id,
@@ -23,6 +25,11 @@ contract FunditBid {
         uint256 coverageOffer,
         uint256 premiumOffer,
         uint256 timestamp
+    );
+
+    event BidVoted(
+        uint256 indexed bidId,
+        address indexed voter
     );
 
     /// @notice 기업이 특정 보험 제안에 입찰을 등록
@@ -54,9 +61,15 @@ contract FunditBid {
         );
     }
 
-    /// @notice 특정 입찰 ID 조회
-    function getBid(uint256 bidId) external view returns (Bid memory) {
-        return bids[bidId];
+    /// @notice 사용자가 특정 입찰안에 투표 (중복 불가)
+    function voteBid(uint256 bidId) external {
+        require(bids[bidId].id != 0, "Invalid bidId");
+        require(!hasVoted[msg.sender][bidId], "Already voted");
+
+        hasVoted[msg.sender][bidId] = true;
+        bidVoteCounts[bidId]++;
+
+        emit BidVoted(bidId, msg.sender);
     }
 
     /// @notice 특정 제안(proposalId)에 달린 입찰 목록 조회
@@ -67,5 +80,10 @@ contract FunditBid {
             result[i] = bids[bidIds[i]];
         }
         return result;
+    }
+
+    /// @notice 특정 입찰 ID 조회
+    function getBid(uint256 bidId) external view returns (Bid memory) {
+        return bids[bidId];
     }
 }

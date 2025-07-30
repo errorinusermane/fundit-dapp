@@ -3,6 +3,5 @@
 /* eslint-disable */
 export { FunditBid__factory } from "./FunditBid__factory";
 export { FunditContract__factory } from "./FunditContract__factory";
-export { FunditOracle__factory } from "./FunditOracle__factory";
 export { FunditProposal__factory } from "./FunditProposal__factory";
 export { FunditToken__factory } from "./FunditToken__factory";

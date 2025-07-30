@@ -3,6 +3,5 @@
 /* eslint-disable */
 export type { FunditBid } from "./FunditBid";
 export type { FunditContract } from "./FunditContract";
-export type { FunditOracle } from "./FunditOracle";
 export type { FunditProposal } from "./FunditProposal";
 export type { FunditToken } from "./FunditToken";

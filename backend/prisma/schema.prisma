@@ -25,7 +25,6 @@ model User {
 enum Role {
   user
   company
-  admin
 }
 
 model Proposal {
@@ -72,25 +71,6 @@ model Contract {
   bid            Bid      @relation(fields: [bidId], references: [id])
   user           User     @relation("UserContracts", fields: [userId], references: [id])
   company        User     @relation("CompanyContracts", fields: [companyId], references: [id])
-
-  verificationRequests VerificationRequest[]
-}
-
-enum OracleVerificationStatus {
-  Pending   // 0
-  Approved  // 1
-  Rejected  // 2
-}
-
-model VerificationRequest {
-  id           Int                      @id @default(autoincrement())
-  contractId   Int                      // 해당 계약 ID
-  requester    String                   // 요청자 주소
-  evidenceHash String
-  status       OracleVerificationStatus
-  timestamp    BigInt
-
-  contract     Contract                 @relation(fields: [contractId], references: [id])
 }
 
 model RewardEvent {

@@ -5,7 +5,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
-export async function requestMagicLink(email: string, role: "user" | "company" | "admin") {
+// ✅ admin 제거된 역할 타입 정의
+type UserRole = "user" | "company";
+
+export async function requestMagicLink(email: string, role: UserRole) {
   const token = generateToken({ email, role, wallet: "" });
   const magicLink = `${FRONTEND_URL}/magic-login?token=${token}`;
   await sendMagicLink(email, magicLink);
@@ -16,9 +19,12 @@ export async function requestMagicLink(email: string, role: "user" | "company" |
  * 토큰 검증 후 유저 DB upsert (존재하면 lastLoginAt만 갱신)
  */
 export async function verifyMagicToken(token: string) {
-  const payload = verifyToken(token); // { email, role }
+  const payload = verifyToken(token) as {
+    email: string;
+    role: UserRole;
+    wallet: string;
+  };
 
-  // 이메일 기준으로 user 등록 or 갱신 (wallet 연결 전 단계)
   const user = await prisma.user.upsert({
     where: { email: payload.email },
     update: { lastLoginAt: new Date() },

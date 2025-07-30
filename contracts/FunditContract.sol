@@ -1,8 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
+interface IFunditBid {
+    function bidVoteCounts(uint256 bidId) external view returns (uint256);
+    function getBid(uint256 bidId) external view returns (
+        uint256 id,
+        uint256 proposalId,
+        address bidder,
+        uint256 coverageOffer,
+        uint256 premiumOffer,
+        uint256 timestamp
+    );
+}
+
 contract FunditContract {
     uint256 public contractCount;
+    IFunditBid public bidContract;
+    uint256 public voteThreshold = 10; // ✅ 필요한 최소 투표 수 (필요시 수정 가능)
 
     enum ContractStatus {
         Active,
@@ -23,9 +37,10 @@ contract FunditContract {
         ContractStatus status;
     }
 
-    mapping(uint256 => InsuranceContract) public contracts; // contractId → contract
-    mapping(address => uint256[]) public contractsByUser;   // user → contractIds
-    mapping(address => uint256[]) public contractsByCompany; // company → contractIds
+    mapping(uint256 => InsuranceContract) public contracts;
+    mapping(address => uint256[]) public contractsByUser;
+    mapping(address => uint256[]) public contractsByCompany;
+    mapping(address => mapping(uint256 => bool)) public hasJoined; // user → bidId → 참여 여부
 
     event ContractConfirmed(
         uint256 indexed contractId,
@@ -37,23 +52,35 @@ contract FunditContract {
         uint256 endTime
     );
 
-    /// @notice 제안자와 입찰 기업 간 계약을 확정
-    function confirmContract(
-        uint256 proposalId,
-        uint256 bidId,
-        address user,
-        address company,
-        uint256 coverageAmount,
-        uint256 premiumAmount,
-        uint256 duration
-    ) external {
+    constructor(address bidContractAddress) {
+        bidContract = IFunditBid(bidContractAddress);
+    }
+
+    /// @notice 개인 유저가 투표 완료 후, 계약 조건이 충족되면 자동 생성
+    function confirmContractIfPopular(uint256 bidId, uint256 duration) external {
+        require(!hasJoined[msg.sender][bidId], "Already joined this bid");
+
+        // 1. 투표 수 확인
+        uint256 voteCount = bidContract.bidVoteCounts(bidId);
+        require(voteCount >= voteThreshold, "Not enough votes");
+
+        // 2. bid 정보 불러오기
+        (
+            ,
+            uint256 proposalId,
+            address company,
+            uint256 coverageAmount,
+            uint256 premiumAmount,
+        ) = bidContract.getBid(bidId);
+
+        // 3. 계약 생성
         contractCount += 1;
 
         InsuranceContract memory newContract = InsuranceContract({
             id: contractCount,
             proposalId: proposalId,
             bidId: bidId,
-            user: user,
+            user: msg.sender,
             company: company,
             coverageAmount: coverageAmount,
             premiumAmount: premiumAmount,
@@ -63,14 +90,15 @@ contract FunditContract {
         });
 
         contracts[contractCount] = newContract;
-        contractsByUser[user].push(contractCount);
+        contractsByUser[msg.sender].push(contractCount);
         contractsByCompany[company].push(contractCount);
+        hasJoined[msg.sender][bidId] = true;
 
         emit ContractConfirmed(
             contractCount,
             proposalId,
             bidId,
-            user,
+            msg.sender,
             company,
             block.timestamp,
             block.timestamp + duration

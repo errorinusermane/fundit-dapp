@@ -4,7 +4,6 @@ fundit-dapp/
 │   ├── FunditBid.sol
 │   ├── FunditContract.sol
 │   ├── FunditToken.sol
-│   ├── FunditOracle.sol
 │   ├── interfaces/
 │   └── utils/
 ├── backend/              # Node.js 백엔드 (Express + viem)
@@ -20,7 +19,6 @@ fundit-dapp/
 │   │   ├── bid.service.ts
 │   │   ├── contract.service.ts
 │   │   ├── token.service.ts
-│   │   └── oracle.service.ts
 │   ├── utils/
 │   ├── middleware/
 │   └── config/
@@ -49,8 +47,7 @@ fundit-dapp/
 │   │       ├── useProposal.ts
 │   │       ├── useBid.ts
 │   │       ├── useContract.ts
-│   │       ├── useToken.ts
-│   │       └── useOracle.ts
+│   │       └── useToken.ts
 │   └── navigation/
 │       └── RootNavigator.tsx
 ├── shared/               # ABI, 타입, 공통 상수
@@ -58,14 +55,12 @@ fundit-dapp/
 │   │   ├── FunditProposal.json
 │   │   ├── FunditBid.json
 │   │   ├── FunditContract.json
-│   │   ├── FunditToken.json
-│   │   └── FunditOracle.json
+│   │   └── FunditToken.json
 │   ├── types/
 │   │   ├── proposal.ts
 │   │   ├── bid.ts
 │   │   ├── contract.ts
-│   │   ├── token.ts
-│   │   └── oracle.ts
+│   │   └── token.ts
 │   └── constants.ts
 ├── scripts/              # 배포 및 검증, 시드 데이터
 │   ├── deploy.ts

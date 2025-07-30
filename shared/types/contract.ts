@@ -1,5 +1,3 @@
-import { VerificationRequest } from "./oracle";
-
 // shared/types/contract.ts
 export interface Contract {
   id: number;
@@ -13,9 +11,6 @@ export interface Contract {
   endDate: number;        // timestamp
   nextPaymentDue: number; // timestamp
   autoPayment: boolean;
-
-  // ✅ 추가: 오라클 요청 내역 (선택적 필드)
-  verificationRequests?: VerificationRequest[];
 }
 
 // 필요 시 확장

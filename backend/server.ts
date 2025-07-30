@@ -6,7 +6,6 @@ import cors from "cors";
 import proposalsRouter from "./routes/proposals.routes";
 import bidsRouter from "./routes/bids.routes";
 import contractRouter from "./routes/contracts.routes";
-import oracleRouter from "./routes/oracle.routes";
 import tokenRouter from "./routes/token.routes"; 
 import authRouter from "./routes/auth.routes"; 
 
@@ -20,7 +19,6 @@ app.use(express.json());
 app.use("/proposals", proposalsRouter);
 app.use("/bids", bidsRouter);
 app.use("/contracts", contractRouter);
-app.use("/oracle", oracleRouter);
 app.use("/token", tokenRouter);
 app.use("/auth", authRouter);
 

@@ -5,10 +5,11 @@ dotenv.config(); // .env에서 JWT_SECRET 불러오기
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 const JWT_EXPIRES_IN = "15m"; // 15분 유효 (magic link 인증용)
+export type UserRole = "user" | "company";
 
-interface TokenPayload {
+export interface TokenPayload {
   email: string;
-  role: "user" | "company" | "admin";
+  role: UserRole;
   wallet: string;
 }
 

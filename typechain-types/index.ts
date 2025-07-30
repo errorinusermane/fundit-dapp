@@ -24,8 +24,6 @@ export type { FunditBid } from "./contracts/FunditBid";
 export { FunditBid__factory } from "./factories/contracts/FunditBid__factory";
 export type { FunditContract } from "./contracts/FunditContract";
 export { FunditContract__factory } from "./factories/contracts/FunditContract__factory";
-export type { FunditOracle } from "./contracts/FunditOracle";
-export { FunditOracle__factory } from "./factories/contracts/FunditOracle__factory";
 export type { FunditProposal } from "./contracts/FunditProposal";
 export { FunditProposal__factory } from "./factories/contracts/FunditProposal__factory";
 export type { FunditToken } from "./contracts/FunditToken";
