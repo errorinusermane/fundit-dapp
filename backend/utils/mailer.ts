@@ -6,8 +6,8 @@ dotenv.config(); // .env에서 GMAIL_USER, GMAIL_APP_PASSWORD 불러오기
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD,
+    user: process.env.GMAIL_USERNAME,
+    pass: process.env.GMAIL_PASSWORD,
   },
 });
 

@@ -5,8 +5,8 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
-export async function requestMagicLink(email: string, role: "user" | "company") {
-  const token = generateToken({ email, role });
+export async function requestMagicLink(email: string, role: "user" | "company" | "admin") {
+  const token = generateToken({ email, role, wallet: "" });
   const magicLink = `${FRONTEND_URL}/magic-login?token=${token}`;
   await sendMagicLink(email, magicLink);
   return token;

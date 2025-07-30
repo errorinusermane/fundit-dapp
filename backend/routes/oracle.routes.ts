@@ -62,28 +62,24 @@ router.get("/status/:contractId", async (req, res) => {
  * ✅ POST /oracle/resolve
  * 오라클 결과 반영 (관리자만 호출)
  */
-router.post("/resolve", authenticateJWT, async (req, res) => {
+router.post("/resolve", async (req, res) => {
+  const { contractId, isApproved } = req.body;
+
+  // ✅ 관리자 권한 체크
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "관리자만 승인할 수 있습니다." });
+  }
+
   try {
-    // ✅ 관리자 권한 확인
-    if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "관리자 권한이 필요합니다." });
-    }
-
-    const { contractId, isApproved } = req.body;
-
-    if (typeof contractId === "undefined" || typeof isApproved === "undefined") {
-      return res.status(400).json({ error: "contractId와 isApproved는 필수입니다." });
-    }
-
     const txHash = await resolveClaim({
       contractId: BigInt(contractId),
       isApproved: Boolean(isApproved),
     });
 
     res.status(200).json({ txHash });
-  } catch (err: any) {
-    console.error("❌ Error in POST /oracle/resolve:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+  } catch (err) {
+    console.error("❌ resolveClaim 실패:", err);
+    res.status(500).json({ error: "검증 결과 반영 실패" });
   }
 });
 
