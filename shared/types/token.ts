@@ -1,3 +1,4 @@
+// shared/types/token.ts
 export interface TokenBalance {
   address: string;
   balance: string;

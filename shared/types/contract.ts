@@ -1,3 +1,4 @@
+// shared/types/contract.ts
 export type ContractStatus = "ACTIVE" | "TERMINATED";
 
 export interface FunditContract {

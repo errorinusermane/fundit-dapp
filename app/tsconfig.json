@@ -1,8 +1,14 @@
+// app/tsconfig.json
 {
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["../shared/*"]
-    }
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./app/types"
+    ],
+    "lib": ["ES2020", "DOM"]
   }
 }
