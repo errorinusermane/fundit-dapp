@@ -14,6 +14,8 @@
     "@nomicfoundation/hardhat-toolbox": "^6.1.0",
     "@openzeppelin/contracts": "^5.4.0",
     "@types/node": "^24.1.0",
+    "@types/react": "^19.1.9",
+    "@types/react-native": "^0.72.8",
     "eslint": "^9.32.0",
     "hardhat": "^2.26.1",
     "prettier": "^3.6.2",
@@ -23,6 +25,8 @@
   "dependencies": {
     "dotenv": "^17.2.1",
     "ethers": "^6.15.0",
+    "react": "^19.1.1",
+    "react-native": "^0.80.2",
     "react-native-dotenv": "^3.4.11"
   }
 }
