@@ -4,7 +4,7 @@ import {
   verifyMagicToken,
   connectWallet,
 } from "../services/auth.service";
-import { generateToken, UserRole } from "../utils/jwt"; // 🔁 UserRole import
+import { generateToken, UserRole } from "../utils/jwt";
 
 const router = express.Router();
 
@@ -42,14 +42,15 @@ router.get("/verify", async (req, res) => {
   }
 
   try {
-    const payload = await verifyMagicToken(token); // { email, role, wallet }
-
-    const finalToken = generateToken(payload); // 지갑 연결 여부 포함한 JWT 발급
-
+    const result = await verifyMagicToken(token);
     res.status(200).json({
       message: "✅ 인증 성공",
-      token: finalToken,
-      user: payload,
+      token: result.token,
+      user: {
+        email: result.email,
+        role: result.role,
+        wallet: result.wallet,
+      },
     });
   } catch (err) {
     console.error("❌ Token verification failed:", err);
@@ -65,7 +66,7 @@ router.patch("/wallet", async (req, res) => {
   const { email, wallet } = req.body;
 
   if (!email || !wallet) {
-    return res.status(400).json({ error: "email과 wallet이 필요합니다." });
+    return res.status(400).json({ error: "email, wallet이 모두 필요합니다." });
   }
 
   try {

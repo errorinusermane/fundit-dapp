@@ -8,18 +8,17 @@ datasource db {
 }
 
 model User {
-  id           String     @id                      // 지갑 주소 (0x...)
-  email        String     @unique
-  role         Role
-  createdAt    DateTime   @default(now())
-  lastLoginAt  DateTime?  @updatedAt
+  id          String    @id // 지갑 주소 (0x...)
+  email       String    @unique
+  role        Role
+  createdAt   DateTime  @default(now())
+  lastLoginAt DateTime? @updatedAt
 
-  proposals    Proposal[] @relation("UserProposals")
-  bids         Bid[]      @relation("UserBids")
-  contracts    Contract[] @relation("UserContracts")
-  companyAs    Contract[] @relation("CompanyContracts")
-
-  rewards      RewardEvent[]
+  proposals Proposal[]      @relation("UserProposals")
+  bids      Bid[]           @relation("UserBids")
+  contracts Contract[]      @relation("UserContracts")
+  companyAs Contract[]      @relation("CompanyContracts")
+  rewards   RewardHistory[] @relation("UserRewards")
 }
 
 enum Role {
@@ -27,57 +26,102 @@ enum Role {
   company
 }
 
-model Proposal {
-  id             BigInt   @id
-  proposer       String
-  title          String
-  description    String
-  coverageAmount BigInt
-  premium        BigInt
-  deadline       BigInt
-  bids           Bid[]
-  contract       Contract?
+enum ProposalStatus {
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
 
-  user           User     @relation("UserProposals", fields: [proposer], references: [id])
+model Proposal {
+  id                    Int            @id @default(autoincrement())
+  proposer              String
+  title                 String
+  description           String
+  mandatoryRequirements String[]
+  enrollmentConditions  String[]
+  optionalFeatures      String[]
+  desiredStartDate      DateTime
+  minPremium            BigInt
+  maxPremium            BigInt
+  createdAt             DateTime       @default(now())
+  status                ProposalStatus
+  bidCount              Int            @default(0)
+
+  user User  @relation("UserProposals", fields: [proposer], references: [id])
+  bids Bid[]
+}
+
+enum BidStatus {
+  ACTIVE
+  SELECTED
+  REJECTED
 }
 
 model Bid {
-  id            Int      @id @default(autoincrement())
-  proposalId    BigInt
-  bidder        String
-  coverageOffer BigInt
-  premiumOffer  BigInt
-  timestamp     BigInt
+  id                         Int       @id @default(autoincrement())
+  bidId                      Int       @unique // on-chain ID
+  proposalId                 Int
+  company                    String // wallet address
+  companyName                String
+  planTitle                  String
+  planType                   String
+  outpatientCoveragePerVisit Int
+  inpatientCoverage          Int
+  nonCoveredCoverage         Int
+  monthlyPremium             Int
+  contractPeriod             Int
+  ageEligibility             Int
+  occupationEligibility      String
+  voteCount                  Int
+  minVotes                   Int
+  status                     BidStatus
+  createdAt                  DateTime  @default(now())
 
-  proposal      Proposal @relation(fields: [proposalId], references: [id])
-  user          User     @relation("UserBids", fields: [bidder], references: [id])
-  contract      Contract?
+  proposal Proposal @relation(fields: [proposalId], references: [id])
+  user     User     @relation("UserBids", fields: [company], references: [id])
+
+  @@index([proposalId])
+  @@index([company])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model Contract {
-  id             Int     @id @default(autoincrement())
-  proposalId     BigInt  @unique
-  bidId          Int     @unique
-  userId         String
-  companyId      String
-  coverageAmount BigInt
-  premium        BigInt
-  startDate      Int
-  endDate        Int
-  nextPaymentDue Int
-  autoPayment    Boolean
+  id             Int            @id @default(autoincrement())
+  contractId     Int            @unique
+  proposalId     Int
+  bidId          Int
+  userAddress    String         @db.VarChar(42)
+  companyAddress String         @db.VarChar(42)
+  monthlyPremium BigInt
+  contractPeriod Int
+  startDate      DateTime
+  autoPayment    Boolean        @default(false)
+  status         ContractStatus
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
-  proposal       Proposal @relation(fields: [proposalId], references: [id])
-  bid            Bid      @relation(fields: [bidId], references: [id])
-  user           User     @relation("UserContracts", fields: [userId], references: [id])
-  company        User     @relation("CompanyContracts", fields: [companyId], references: [id])
+  user    User @relation("UserContracts", fields: [userAddress], references: [id])
+  company User @relation("CompanyContracts", fields: [companyAddress], references: [id])
+
+  @@index([userAddress])
+  @@index([companyAddress])
+  @@index([proposalId])
 }
 
-model RewardEvent {
-  id        Int      @id @default(autoincrement())
-  userId    String
-  amount    BigInt
-  timestamp BigInt
+enum ContractStatus {
+  ACTIVE
+  TERMINATED
+}
 
-  user      User     @relation(fields: [userId], references: [id])
+model RewardHistory {
+  id        Int      @id @default(autoincrement())
+  address   String
+  amount    String
+  txHash    String
+  createdAt DateTime @default(now())
+
+  user User @relation("UserRewards", fields: [address], references: [id])
+
+  @@index([address])
 }

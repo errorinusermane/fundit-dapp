@@ -1,114 +1,132 @@
 import { publicClient, walletClient } from "../utils/client";
 import { CONTRACT_ADDRESSES } from "@shared/constants";
 import FunditContractArtifact from "@shared/abi/FunditContract.json";
-import { Contract, ContractDetail } from "@shared/types/contract"; // ✅ 타입 import
+import { ContractStatus, FunditContract } from "@shared/types/contract";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditContract as `0x${string}`;
 const contractAbi = FunditContractArtifact.abi as readonly unknown[];
 
-export async function confirmContract(bidId: number) {
-  const { request } = await publicClient.simulateContract({
+/**
+ * 계약 확정 → confirmContract
+ */
+export async function confirmContract(params: {
+  proposalId: number;
+  bidId: number;
+  user: string;
+  company: string;
+  monthlyPremium: bigint;
+  contractPeriod: number;
+}) {
+  const { proposalId, bidId, user, company, monthlyPremium, contractPeriod } = params;
+
+  const tx = await walletClient.writeContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "confirmContract",
-    args: [BigInt(bidId)],
-    account: walletClient.account,
+    args: [
+      BigInt(proposalId),
+      BigInt(bidId),
+      user,
+      company,
+      monthlyPremium,
+      BigInt(contractPeriod),
+    ],
   });
 
-  const hash = await walletClient.writeContract(request);
-  return hash; // txHash 반환
+  return tx;
 }
 
-export async function getContractsByUser(userAddress: string): Promise<Contract[]> {
-  const result = await publicClient.readContract({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: "getContractsByUser",
-    args: [userAddress],
-  }) as Contract[];;
-
-  return result.map((c: any) => ({
-    id: Number(c.id),
-    proposalId: Number(c.proposalId),
-    bidId: Number(c.bidId),
-    user: c.user,
-    company: c.company,
-    coverageAmount: BigInt(c.coverageAmount),
-    premium: BigInt(c.premium),
-    startDate: Number(c.startDate),
-    endDate: Number(c.endDate),
-    nextPaymentDue: Number(c.nextPaymentDue),
-    autoPayment: c.autoPayment,
-  }));
-}
-
-export async function getContractsByCompany(companyAddress: string): Promise<Contract[]> {
-  const result = await publicClient.readContract({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: "getContractsByCompany",
-    args: [companyAddress],
-  }) as Contract[];;
-
-  return result.map((c: any) => ({
-    id: Number(c.id),
-    proposalId: Number(c.proposalId),
-    bidId: Number(c.bidId),
-    user: c.user,
-    company: c.company,
-    coverageAmount: BigInt(c.coverageAmount),
-    premium: BigInt(c.premium),
-    startDate: Number(c.startDate),
-    endDate: Number(c.endDate),
-    nextPaymentDue: Number(c.nextPaymentDue),
-    autoPayment: c.autoPayment,
-  }));
-}
-
-export async function getContractDetail(contractId: number): Promise<ContractDetail> {
-  const c: any = await publicClient.readContract({
-    address: contractAddress,
-    abi: contractAbi,
-    functionName: "getContractDetail",
-    args: [BigInt(contractId)],
-  });
-
-  return {
-    id: Number(c.id),
-    proposalId: Number(c.proposalId),
-    bidId: Number(c.bidId),
-    user: c.user,
-    company: c.company,
-    coverageAmount: BigInt(c.coverageAmount),
-    premium: BigInt(c.premium),
-    startDate: Number(c.startDate),
-    endDate: Number(c.endDate),
-    nextPaymentDue: Number(c.nextPaymentDue),
-    autoPayment: c.autoPayment,
-    status: c.status, // "ACTIVE" | "EXPIRED" | "CANCELLED"
-  };
-}
-
+/**
+ * 자동 납부 토글 → toggleAutoPayment
+ */
 export async function toggleAutoPayment(contractId: number) {
-  const { request } = await publicClient.simulateContract({
+  const tx = await walletClient.writeContract({
     address: contractAddress,
     abi: contractAbi,
     functionName: "toggleAutoPayment",
     args: [BigInt(contractId)],
-    account: walletClient.account,
   });
 
-  const hash = await walletClient.writeContract(request);
-  return hash;
+  return tx;
 }
 
-export async function getNextPaymentDue(contractId: number): Promise<number> {
-  const nextDue: bigint = await publicClient.readContract({
+/**
+ * 개별 계약 상세 조회 → getContract
+ */
+export async function getContractDetail(contractId: number): Promise<FunditContract> {
+  const raw = await publicClient.readContract({
     address: contractAddress,
     abi: contractAbi,
-    functionName: "getNextPaymentDue",
+    functionName: "getContract",
     args: [BigInt(contractId)],
-  }) as bigint;
+  });
 
-  return Number(nextDue);
+  return parseContract(raw);
+}
+
+/**
+ * 유저 주소 기준 계약 리스트 조회 → getContractsByUser
+ */
+export async function getContractsByUser(address: string): Promise<FunditContract[]> {
+  const ids = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getContractsByUser",
+    args: [address],
+  }) as bigint[];
+
+  const results = await Promise.all(
+    ids.map(async (id) => getContractDetail(Number(id)))
+  );
+
+  return results;
+}
+
+/**
+ * 기업 주소 기준 계약 리스트 조회 → getContractsByCompany
+ */
+export async function getContractsByCompany(address: string): Promise<FunditContract[]> {
+  const ids = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getContractsByUser",
+    args: [address],
+  }) as bigint[];
+
+  const results = await Promise.all(
+    ids.map(async (id) => getContractDetail(Number(id)))
+  );
+
+  return results;
+}
+
+/**
+ * 전체 계약 ID 목록 → getAllContracts
+ */
+export async function getAllContractIds(): Promise<number[]> {
+  const ids = await publicClient.readContract({
+    address: contractAddress,
+    abi: contractAbi,
+    functionName: "getAllContracts",
+  }) as bigint[];
+
+  return ids.map((id) => Number(id));
+}
+
+/**
+ * 내부 파서 – Solidity 반환값 → TypeScript 타입
+ */
+function parseContract(raw: any): FunditContract {
+  return {
+    id: Number(raw.id),
+    proposalId: Number(raw.proposalId),
+    bidId: Number(raw.bidId),
+    user: raw.user,
+    company: raw.company,
+    monthlyPremium: Number(raw.monthlyPremium),
+    contractPeriod: Number(raw.contractPeriod),
+    startDate: Number(raw.startDate),
+    autoPayment: raw.autoPayment,
+    status: (["ACTIVE", "TERMINATED"] as ContractStatus[])[Number(raw.status)],
+  };
 }

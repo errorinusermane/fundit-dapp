@@ -6,140 +6,118 @@ import {
   getProposalsByUser,
   getActiveProposals,
   closeProposal,
+  calculateRemainingTime,
 } from "../services/proposal.service";
+import { Address } from "viem";
 
 const router = express.Router();
 
-// ✅ POST /proposals
+/**
+ * POST /proposals
+ * 제안 생성
+ */
 router.post("/", async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      coverageAmount,
-      premium,
-      deadline,
-    } = req.body;
+    const { walletAddress, ...input } = req.body;
+    if (!walletAddress) return res.status(400).json({ error: "walletAddress required" });
 
-    if (!title || !description || !coverageAmount || !premium || !deadline) {
-      return res.status(400).json({ error: "All fields are required." });
-    }
-
-    const txHash = await createProposal(
-      title,
-      description,
-      BigInt(coverageAmount),
-      BigInt(premium),
-      BigInt(deadline)
-    );
-
-    res.status(200).json({ txHash });
-  } catch (err: any) {
-    console.error("❌ Error in POST /proposals:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    const txHash = await createProposal(input, walletAddress as Address);
+    res.status(201).json({ txHash });
+  } catch (err) {
+    console.error("❌ createProposal failed:", err);
+    res.status(500).json({ error: "Failed to create proposal" });
   }
 });
 
-// ✅ GET /proposals
-router.get("/", async (_, res) => {
+/**
+ * GET /proposals
+ * 전체 제안 조회
+ */
+router.get("/", async (_req, res) => {
   try {
-    const rawProposals = await getAllProposals();
-
-    const proposals = rawProposals.map((p) => ({
-      id: p.id.toString(),
-      proposer: p.proposer,
-      title: p.title,
-      description: p.description,
-      coverageAmount: p.coverageAmount.toString(),
-      premium: p.premium.toString(),
-      deadline: p.deadline.toString(),
+    const proposals = await getAllProposals();
+    const withRemainingTime = proposals.map((p) => ({
+      ...p,
+      remainingTime: calculateRemainingTime(p.desiredStartDate),
     }));
-
-    res.status(200).json({ proposals });
-  } catch (err: any) {
-    console.error("❌ Error in GET /proposals:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    res.json(withRemainingTime);
+  } catch (err) {
+    console.error("❌ getAllProposals failed:", err);
+    res.status(500).json({ error: "Failed to fetch proposals" });
   }
 });
 
-// ✅ GET /proposals/:id
+/**
+ * GET /proposals/active
+ * ACTIVE 상태의 제안만 조회
+ */
+router.get("/active", async (_req, res) => {
+  try {
+    const proposals = await getActiveProposals();
+    const withRemainingTime = proposals.map((p) => ({
+      ...p,
+      remainingTime: calculateRemainingTime(p.desiredStartDate),
+    }));
+    res.json(withRemainingTime);
+  } catch (err) {
+    console.error("❌ getActiveProposals failed:", err);
+    res.status(500).json({ error: "Failed to fetch active proposals" });
+  }
+});
+
+/**
+ * GET /proposals/:id
+ * 단건 상세 조회
+ */
 router.get("/:id", async (req, res) => {
   try {
-    const proposalId = BigInt(req.params.id);
-    const p = await getProposalById(proposalId);
-
-    const proposal = {
-      id: p.id.toString(),
-      proposer: p.proposer,
-      title: p.title,
-      description: p.description,
-      coverageAmount: p.coverageAmount.toString(),
-      premium: p.premium.toString(),
-      deadline: p.deadline.toString(),
+    const id = Number(req.params.id);
+    const proposal = await getProposalById(id);
+    const withRemainingTime = {
+      ...proposal,
+      remainingTime: calculateRemainingTime(proposal.desiredStartDate),
     };
-
-    res.status(200).json({ proposal });
-  } catch (err: any) {
-    console.error("❌ Error in GET /proposals/:id:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    res.json(withRemainingTime);
+  } catch (err) {
+    console.error("❌ getProposalById failed:", err);
+    res.status(500).json({ error: "Failed to fetch proposal" });
   }
 });
 
-// ✅ GET /proposals/user/:address
+/**
+ * GET /proposals/user/:address
+ * 유저가 생성한 제안 목록
+ */
 router.get("/user/:address", async (req, res) => {
   try {
-    const address = req.params.address;
-    const rawProposals = await getProposalsByUser(address);
-
-    const proposals = rawProposals.map((p) => ({
-      id: p.id.toString(),
-      proposer: p.proposer,
-      title: p.title,
-      description: p.description,
-      coverageAmount: p.coverageAmount.toString(),
-      premium: p.premium.toString(),
-      deadline: p.deadline.toString(),
+    const address = req.params.address as Address;
+    const proposals = await getProposalsByUser(address);
+    const withRemainingTime = proposals.map((p) => ({
+      ...p,
+      remainingTime: calculateRemainingTime(p.desiredStartDate),
     }));
-
-    res.status(200).json({ proposals });
-  } catch (err: any) {
-    console.error("❌ Error in GET /proposals/user/:address:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    res.json(withRemainingTime);
+  } catch (err) {
+    console.error("❌ getProposalsByUser failed:", err);
+    res.status(500).json({ error: "Failed to fetch user's proposals" });
   }
 });
 
-// ✅ GET /proposals/active
-router.get("/active", async (_, res) => {
-  try {
-    const rawProposals = await getActiveProposals();
-
-    const proposals = rawProposals.map((p) => ({
-      id: p.id.toString(),
-      proposer: p.proposer,
-      title: p.title,
-      description: p.description,
-      coverageAmount: p.coverageAmount.toString(),
-      premium: p.premium.toString(),
-      deadline: p.deadline.toString(),
-    }));
-
-    res.status(200).json({ proposals });
-  } catch (err: any) {
-    console.error("❌ Error in GET /proposals/active:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
-  }
-});
-
-// ✅ POST /proposals/:id/close
+/**
+ * POST /proposals/:id/close
+ * 제안 마감 (작성자만)
+ */
 router.post("/:id/close", async (req, res) => {
   try {
-    const proposalId = BigInt(req.params.id);
-    const txHash = await closeProposal(proposalId);
+    const id = Number(req.params.id);
+    const { walletAddress } = req.body;
+    if (!walletAddress) return res.status(400).json({ error: "walletAddress required" });
 
-    res.status(200).json({ txHash });
-  } catch (err: any) {
-    console.error("❌ Error in POST /proposals/:id/close:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    const txHash = await closeProposal(id, walletAddress as Address);
+    res.json({ txHash });
+  } catch (err) {
+    console.error("❌ closeProposal failed:", err);
+    res.status(500).json({ error: "Failed to close proposal" });
   }
 });
 

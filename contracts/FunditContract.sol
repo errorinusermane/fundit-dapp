@@ -1,28 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
-
-interface IFunditBid {
-    function bidVoteCounts(uint256 bidId) external view returns (uint256);
-    function getBid(uint256 bidId) external view returns (
-        uint256 id,
-        uint256 proposalId,
-        address bidder,
-        uint256 coverageOffer,
-        uint256 premiumOffer,
-        uint256 timestamp
-    );
-}
+pragma solidity ^0.8.20;
 
 contract FunditContract {
-    uint256 public contractCount;
-    IFunditBid public bidContract;
-    uint256 public voteThreshold = 10; // ✅ 필요한 최소 투표 수 (필요시 수정 가능)
-
-    enum ContractStatus {
-        Active,
-        Completed,
-        Cancelled
-    }
+    enum ContractStatus { ACTIVE, TERMINATED }
 
     struct InsuranceContract {
         uint256 id;
@@ -30,112 +10,102 @@ contract FunditContract {
         uint256 bidId;
         address user;
         address company;
-        uint256 coverageAmount;
-        uint256 premiumAmount;
-        uint256 startTime;
-        uint256 endTime;
+        uint256 monthlyPremium;
+        uint256 contractPeriod; // in months
+        uint256 startDate; // timestamp
+        bool autoPayment;
         ContractStatus status;
     }
 
+    uint256 public nextContractId;
     mapping(uint256 => InsuranceContract) public contracts;
+
     mapping(address => uint256[]) public contractsByUser;
     mapping(address => uint256[]) public contractsByCompany;
-    mapping(address => mapping(uint256 => bool)) public hasJoined; // user → bidId → 참여 여부
 
-    event ContractConfirmed(
-        uint256 indexed contractId,
-        uint256 indexed proposalId,
-        uint256 indexed bidId,
-        address user,
-        address company,
-        uint256 startTime,
-        uint256 endTime
-    );
+    event ContractConfirmed(uint256 contractId, address indexed user, address indexed company);
+    event AutoPaymentToggled(uint256 contractId, bool enabled);
 
-    constructor(address bidContractAddress) {
-        bidContract = IFunditBid(bidContractAddress);
+    constructor() {
+        nextContractId = 1;
     }
 
-    /// @notice 개인 유저가 투표 완료 후, 계약 조건이 충족되면 자동 생성
-    function confirmContractIfPopular(uint256 bidId, uint256 duration) external {
-        require(!hasJoined[msg.sender][bidId], "Already joined this bid");
-
-        // 1. 투표 수 확인
-        uint256 voteCount = bidContract.bidVoteCounts(bidId);
-        require(voteCount >= voteThreshold, "Not enough votes");
-
-        // 2. bid 정보 불러오기
-        (
-            ,
-            uint256 proposalId,
-            address company,
-            uint256 coverageAmount,
-            uint256 premiumAmount,
-        ) = bidContract.getBid(bidId);
-
-        // 3. 계약 생성
-        contractCount += 1;
-
-        InsuranceContract memory newContract = InsuranceContract({
-            id: contractCount,
-            proposalId: proposalId,
-            bidId: bidId,
-            user: msg.sender,
-            company: company,
-            coverageAmount: coverageAmount,
-            premiumAmount: premiumAmount,
-            startTime: block.timestamp,
-            endTime: block.timestamp + duration,
-            status: ContractStatus.Active
+    /**
+     * @dev 입찰 확정 → 계약 생성
+     * @param _proposalId 제안 ID
+     * @param _bidId 입찰 ID
+     * @param _user 개인 주소
+     * @param _company 기업 주소
+     * @param _monthlyPremium 월 보험료
+     * @param _contractPeriod 계약 기간 (개월 수)
+     */
+    function confirmContract(
+        uint256 _proposalId,
+        uint256 _bidId,
+        address _user,
+        address _company,
+        uint256 _monthlyPremium,
+        uint256 _contractPeriod
+    ) external {
+        uint256 contractId = nextContractId++;
+        contracts[contractId] = InsuranceContract({
+            id: contractId,
+            proposalId: _proposalId,
+            bidId: _bidId,
+            user: _user,
+            company: _company,
+            monthlyPremium: _monthlyPremium,
+            contractPeriod: _contractPeriod,
+            startDate: block.timestamp,
+            autoPayment: false,
+            status: ContractStatus.ACTIVE
         });
 
-        contracts[contractCount] = newContract;
-        contractsByUser[msg.sender].push(contractCount);
-        contractsByCompany[company].push(contractCount);
-        hasJoined[msg.sender][bidId] = true;
+        contractsByUser[_user].push(contractId);
+        contractsByCompany[_company].push(contractId);
 
-        emit ContractConfirmed(
-            contractCount,
-            proposalId,
-            bidId,
-            msg.sender,
-            company,
-            block.timestamp,
-            block.timestamp + duration
-        );
+        emit ContractConfirmed(contractId, _user, _company);
     }
 
-    function getContract(uint256 contractId) external view returns (InsuranceContract memory) {
-        return contracts[contractId];
+    /**
+     * @dev 자동납부 토글
+     */
+    function toggleAutoPayment(uint256 _contractId) external {
+        InsuranceContract storage c = contracts[_contractId];
+        require(c.user == msg.sender || c.company == msg.sender, "Not authorized");
+        c.autoPayment = !c.autoPayment;
+        emit AutoPaymentToggled(_contractId, c.autoPayment);
     }
 
-    function getContractsByUser(address user) external view returns (InsuranceContract[] memory) {
-        uint256[] memory ids = contractsByUser[user];
-        InsuranceContract[] memory result = new InsuranceContract[](ids.length);
-        for (uint256 i = 0; i < ids.length; i++) {
-            result[i] = contracts[ids[i]];
+    /**
+     * @dev 개인의 계약 목록
+     */
+    function getContractsByUser(address _user) external view returns (uint256[] memory) {
+        return contractsByUser[_user];
+    }
+
+    /**
+     * @dev 기업의 계약 목록
+     */
+    function getContractsByCompany(address _company) external view returns (uint256[] memory) {
+        return contractsByCompany[_company];
+    }
+
+    /**
+     * @dev 특정 계약 상세 조회
+     */
+    function getContract(uint256 _contractId) external view returns (InsuranceContract memory) {
+        return contracts[_contractId];
+    }
+
+    /**
+     * @dev 전체 계약 ID 목록 (Off-chain에서 전체 계약 조회 시 사용)
+     */
+    function getAllContracts() external view returns (uint256[] memory) {
+        uint256[] memory ids = new uint256[](nextContractId - 1);
+        for (uint256 i = 0; i < nextContractId - 1; i++) {
+            ids[i] = i + 1;
         }
-        return result;
-    }
-
-    function getContractsByCompany(address company) external view returns (InsuranceContract[] memory) {
-        uint256[] memory ids = contractsByCompany[company];
-        InsuranceContract[] memory result = new InsuranceContract[](ids.length);
-        for (uint256 i = 0; i < ids.length; i++) {
-            result[i] = contracts[ids[i]];
-        }
-        return result;
-    }
-
-    function completeContract(uint256 contractId) external {
-        InsuranceContract storage c = contracts[contractId];
-        require(c.status == ContractStatus.Active, "Contract must be active");
-        c.status = ContractStatus.Completed;
-    }
-
-    function cancelContract(uint256 contractId) external {
-        InsuranceContract storage c = contracts[contractId];
-        require(c.status == ContractStatus.Active, "Contract must be active");
-        c.status = ContractStatus.Cancelled;
+        return ids;
     }
 }

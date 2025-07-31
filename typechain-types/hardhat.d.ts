@@ -50,10 +50,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FunditContract__factory>;
     getContractFactory(
-      name: "IFunditBid",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IFunditBid__factory>;
-    getContractFactory(
       name: "FunditProposal",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FunditProposal__factory>;
@@ -108,11 +104,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.FunditContract>;
     getContractAt(
-      name: "IFunditBid",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IFunditBid>;
-    getContractAt(
       name: "FunditProposal",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -159,10 +150,6 @@ declare module "hardhat/types/runtime" {
       name: "FunditContract",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.FunditContract>;
-    deployContract(
-      name: "IFunditBid",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IFunditBid>;
     deployContract(
       name: "FunditProposal",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -217,11 +204,6 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.FunditContract>;
-    deployContract(
-      name: "IFunditBid",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IFunditBid>;
     deployContract(
       name: "FunditProposal",
       args: any[],

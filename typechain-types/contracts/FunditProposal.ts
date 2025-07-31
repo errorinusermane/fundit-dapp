@@ -29,9 +29,15 @@ export declare namespace FunditProposal {
     proposer: AddressLike;
     title: string;
     description: string;
-    coverageAmount: BigNumberish;
-    premium: BigNumberish;
-    deadline: BigNumberish;
+    mandatoryRequirements: string[];
+    enrollmentConditions: string[];
+    optionalFeatures: string[];
+    desiredStartDate: BigNumberish;
+    minPremium: BigNumberish;
+    maxPremium: BigNumberish;
+    createdAt: BigNumberish;
+    status: BigNumberish;
+    bidCount: BigNumberish;
   };
 
   export type ProposalStructOutput = [
@@ -39,17 +45,29 @@ export declare namespace FunditProposal {
     proposer: string,
     title: string,
     description: string,
-    coverageAmount: bigint,
-    premium: bigint,
-    deadline: bigint
+    mandatoryRequirements: string[],
+    enrollmentConditions: string[],
+    optionalFeatures: string[],
+    desiredStartDate: bigint,
+    minPremium: bigint,
+    maxPremium: bigint,
+    createdAt: bigint,
+    status: bigint,
+    bidCount: bigint
   ] & {
     id: bigint;
     proposer: string;
     title: string;
     description: string;
-    coverageAmount: bigint;
-    premium: bigint;
-    deadline: bigint;
+    mandatoryRequirements: string[];
+    enrollmentConditions: string[];
+    optionalFeatures: string[];
+    desiredStartDate: bigint;
+    minPremium: bigint;
+    maxPremium: bigint;
+    createdAt: bigint;
+    status: bigint;
+    bidCount: bigint;
   };
 }
 
@@ -58,10 +76,13 @@ export interface FunditProposalInterface extends Interface {
     nameOrSignature:
       | "closeProposal"
       | "createProposal"
-      | "getAllProposals"
+      | "getActiveProposals"
       | "getProposal"
-      | "proposalCount"
+      | "getProposalCount"
+      | "getProposalsByUser"
+      | "incrementBidCount"
       | "proposals"
+      | "userProposals"
   ): FunctionFragment;
 
   getEvent(
@@ -74,10 +95,19 @@ export interface FunditProposalInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createProposal",
-    values: [string, string, BigNumberish, BigNumberish, BigNumberish]
+    values: [
+      string,
+      string,
+      string[],
+      string[],
+      string[],
+      BigNumberish,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAllProposals",
+    functionFragment: "getActiveProposals",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -85,12 +115,24 @@ export interface FunditProposalInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "proposalCount",
+    functionFragment: "getProposalCount",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getProposalsByUser",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "incrementBidCount",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "proposals",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "userProposals",
+    values: [AddressLike, BigNumberish]
   ): string;
 
   decodeFunctionResult(
@@ -102,7 +144,7 @@ export interface FunditProposalInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getAllProposals",
+    functionFragment: "getActiveProposals",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -110,18 +152,29 @@ export interface FunditProposalInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "proposalCount",
+    functionFragment: "getProposalCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getProposalsByUser",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "incrementBidCount",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "proposals", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "userProposals",
+    data: BytesLike
+  ): Result;
 }
 
 export namespace ProposalClosedEvent {
-  export type InputTuple = [id: BigNumberish, closedAt: BigNumberish];
-  export type OutputTuple = [id: bigint, closedAt: bigint];
+  export type InputTuple = [proposalId: BigNumberish];
+  export type OutputTuple = [proposalId: bigint];
   export interface OutputObject {
-    id: bigint;
-    closedAt: bigint;
+    proposalId: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -130,29 +183,11 @@ export namespace ProposalClosedEvent {
 }
 
 export namespace ProposalCreatedEvent {
-  export type InputTuple = [
-    id: BigNumberish,
-    proposer: AddressLike,
-    title: string,
-    coverageAmount: BigNumberish,
-    premium: BigNumberish,
-    deadline: BigNumberish
-  ];
-  export type OutputTuple = [
-    id: bigint,
-    proposer: string,
-    title: string,
-    coverageAmount: bigint,
-    premium: bigint,
-    deadline: bigint
-  ];
+  export type InputTuple = [proposalId: BigNumberish, proposer: AddressLike];
+  export type OutputTuple = [proposalId: bigint, proposer: string];
   export interface OutputObject {
-    id: bigint;
+    proposalId: bigint;
     proposer: string;
-    title: string;
-    coverageAmount: bigint;
-    premium: bigint;
-    deadline: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -203,47 +238,86 @@ export interface FunditProposal extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  closeProposal: TypedContractMethod<[_id: BigNumberish], [void], "nonpayable">;
+  closeProposal: TypedContractMethod<
+    [_proposalId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   createProposal: TypedContractMethod<
     [
       _title: string,
       _description: string,
-      _coverageAmount: BigNumberish,
-      _premium: BigNumberish,
-      _deadline: BigNumberish
+      _mandatoryRequirements: string[],
+      _enrollmentConditions: string[],
+      _optionalFeatures: string[],
+      _desiredStartDate: BigNumberish,
+      _minPremium: BigNumberish,
+      _maxPremium: BigNumberish
     ],
     [void],
     "nonpayable"
   >;
 
-  getAllProposals: TypedContractMethod<
+  getActiveProposals: TypedContractMethod<
     [],
     [FunditProposal.ProposalStructOutput[]],
     "view"
   >;
 
   getProposal: TypedContractMethod<
-    [_id: BigNumberish],
+    [_proposalId: BigNumberish],
     [FunditProposal.ProposalStructOutput],
     "view"
   >;
 
-  proposalCount: TypedContractMethod<[], [bigint], "view">;
+  getProposalCount: TypedContractMethod<[], [bigint], "view">;
+
+  getProposalsByUser: TypedContractMethod<
+    [_user: AddressLike],
+    [FunditProposal.ProposalStructOutput[]],
+    "view"
+  >;
+
+  incrementBidCount: TypedContractMethod<
+    [_proposalId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   proposals: TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [bigint, string, string, string, bigint, bigint, bigint] & {
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
         id: bigint;
         proposer: string;
         title: string;
         description: string;
-        coverageAmount: bigint;
-        premium: bigint;
-        deadline: bigint;
+        desiredStartDate: bigint;
+        minPremium: bigint;
+        maxPremium: bigint;
+        createdAt: bigint;
+        status: bigint;
+        bidCount: bigint;
       }
     ],
+    "view"
+  >;
+
+  userProposals: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
     "view"
   >;
 
@@ -253,48 +327,82 @@ export interface FunditProposal extends BaseContract {
 
   getFunction(
     nameOrSignature: "closeProposal"
-  ): TypedContractMethod<[_id: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<[_proposalId: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "createProposal"
   ): TypedContractMethod<
     [
       _title: string,
       _description: string,
-      _coverageAmount: BigNumberish,
-      _premium: BigNumberish,
-      _deadline: BigNumberish
+      _mandatoryRequirements: string[],
+      _enrollmentConditions: string[],
+      _optionalFeatures: string[],
+      _desiredStartDate: BigNumberish,
+      _minPremium: BigNumberish,
+      _maxPremium: BigNumberish
     ],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "getAllProposals"
+    nameOrSignature: "getActiveProposals"
   ): TypedContractMethod<[], [FunditProposal.ProposalStructOutput[]], "view">;
   getFunction(
     nameOrSignature: "getProposal"
   ): TypedContractMethod<
-    [_id: BigNumberish],
+    [_proposalId: BigNumberish],
     [FunditProposal.ProposalStructOutput],
     "view"
   >;
   getFunction(
-    nameOrSignature: "proposalCount"
+    nameOrSignature: "getProposalCount"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "getProposalsByUser"
+  ): TypedContractMethod<
+    [_user: AddressLike],
+    [FunditProposal.ProposalStructOutput[]],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "incrementBidCount"
+  ): TypedContractMethod<[_proposalId: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "proposals"
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [bigint, string, string, string, bigint, bigint, bigint] & {
+      [
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
         id: bigint;
         proposer: string;
         title: string;
         description: string;
-        coverageAmount: bigint;
-        premium: bigint;
-        deadline: bigint;
+        desiredStartDate: bigint;
+        minPremium: bigint;
+        maxPremium: bigint;
+        createdAt: bigint;
+        status: bigint;
+        bidCount: bigint;
       }
     ],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "userProposals"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [bigint],
     "view"
   >;
 
@@ -314,7 +422,7 @@ export interface FunditProposal extends BaseContract {
   >;
 
   filters: {
-    "ProposalClosed(uint256,uint256)": TypedContractEvent<
+    "ProposalClosed(uint256)": TypedContractEvent<
       ProposalClosedEvent.InputTuple,
       ProposalClosedEvent.OutputTuple,
       ProposalClosedEvent.OutputObject
@@ -325,7 +433,7 @@ export interface FunditProposal extends BaseContract {
       ProposalClosedEvent.OutputObject
     >;
 
-    "ProposalCreated(uint256,address,string,uint256,uint256,uint256)": TypedContractEvent<
+    "ProposalCreated(uint256,address)": TypedContractEvent<
       ProposalCreatedEvent.InputTuple,
       ProposalCreatedEvent.OutputTuple,
       ProposalCreatedEvent.OutputObject

@@ -1,42 +1,32 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FunditToken is ERC20, Ownable {
-    address public minter;
+    mapping(address => uint256) public claimedRewards;
 
-    event MinterUpdated(address indexed oldMinter, address indexed newMinter);
-
-    struct RewardEvent {
-        uint256 amount;
-        uint256 timestamp;
-    }
-
-    mapping(address => RewardEvent[]) public rewardHistory;
+    event RewardClaimed(address indexed user, uint256 amount);
 
     constructor() ERC20("Fundit Token", "FDT") Ownable(msg.sender) {
-        _mint(msg.sender, 1_000_000 * 10 ** decimals());
+        // 필요 시 초기 설정 가능
     }
 
-    function setMinter(address _minter) external onlyOwner {
-        emit MinterUpdated(minter, _minter);
-        minter = _minter;
-    }
-
-    function mintReward(address to, uint256 amount) external {
-        require(msg.sender == minter, "Only minter can mint");
+    function mint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
-        rewardHistory[to].push(RewardEvent(amount, block.timestamp));
     }
 
-    function getRewardHistoryLength(address user) external view returns (uint256) {
-        return rewardHistory[user].length;
+    function claimReward(address user, uint256 amount) external onlyOwner {
+        require(amount > 0, "Reward amount must be greater than zero");
+
+        claimedRewards[user] += amount;
+        _mint(user, amount);
+
+        emit RewardClaimed(user, amount);
     }
 
-    function getRewardHistoryItem(address user, uint256 index) external view returns (uint256 amount, uint256 timestamp) {
-        RewardEvent memory evt = rewardHistory[user][index];
-        return (evt.amount, evt.timestamp);
+    function getClaimedReward(address user) external view returns (uint256) {
+        return claimedRewards[user];
     }
 }

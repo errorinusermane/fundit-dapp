@@ -25,57 +25,81 @@ import type {
 
 export declare namespace FunditBid {
   export type BidStruct = {
-    id: BigNumberish;
+    company: AddressLike;
     proposalId: BigNumberish;
-    bidder: AddressLike;
-    coverageOffer: BigNumberish;
-    premiumOffer: BigNumberish;
-    timestamp: BigNumberish;
+    companyName: string;
+    planTitle: string;
+    planType: string;
+    outpatientCoveragePerVisit: BigNumberish;
+    inpatientCoverage: BigNumberish;
+    nonCoveredCoverage: BigNumberish;
+    monthlyPremium: BigNumberish;
+    contractPeriod: BigNumberish;
+    ageEligibility: BigNumberish;
+    occupationEligibility: string;
+    voteCount: BigNumberish;
+    minVotes: BigNumberish;
+    status: BigNumberish;
+    createdAt: BigNumberish;
   };
 
   export type BidStructOutput = [
-    id: bigint,
+    company: string,
     proposalId: bigint,
-    bidder: string,
-    coverageOffer: bigint,
-    premiumOffer: bigint,
-    timestamp: bigint
+    companyName: string,
+    planTitle: string,
+    planType: string,
+    outpatientCoveragePerVisit: bigint,
+    inpatientCoverage: bigint,
+    nonCoveredCoverage: bigint,
+    monthlyPremium: bigint,
+    contractPeriod: bigint,
+    ageEligibility: bigint,
+    occupationEligibility: string,
+    voteCount: bigint,
+    minVotes: bigint,
+    status: bigint,
+    createdAt: bigint
   ] & {
-    id: bigint;
+    company: string;
     proposalId: bigint;
-    bidder: string;
-    coverageOffer: bigint;
-    premiumOffer: bigint;
-    timestamp: bigint;
+    companyName: string;
+    planTitle: string;
+    planType: string;
+    outpatientCoveragePerVisit: bigint;
+    inpatientCoverage: bigint;
+    nonCoveredCoverage: bigint;
+    monthlyPremium: bigint;
+    contractPeriod: bigint;
+    ageEligibility: bigint;
+    occupationEligibility: string;
+    voteCount: bigint;
+    minVotes: bigint;
+    status: bigint;
+    createdAt: bigint;
   };
 }
 
 export interface FunditBidInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "bidCount"
-      | "bidVoteCounts"
       | "bids"
-      | "bidsByProposal"
       | "getBid"
       | "getBidsByProposal"
+      | "getMyBids"
+      | "getVotes"
       | "hasVoted"
+      | "proposalToBids"
       | "submitBid"
+      | "updateBidStatus"
       | "voteBid"
   ): FunctionFragment;
 
-  getEvent(nameOrSignatureOrTopic: "BidSubmitted" | "BidVoted"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "BidStatusUpdated" | "BidSubmitted" | "BidVoted"
+  ): EventFragment;
 
-  encodeFunctionData(functionFragment: "bidCount", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "bidVoteCounts",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "bids", values: [BigNumberish]): string;
-  encodeFunctionData(
-    functionFragment: "bidsByProposal",
-    values: [BigNumberish, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "getBid",
     values: [BigNumberish]
@@ -85,62 +109,96 @@ export interface FunditBidInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getMyBids",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getVotes",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "hasVoted",
-    values: [AddressLike, BigNumberish]
+    values: [BigNumberish, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "proposalToBids",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "submitBid",
-    values: [BigNumberish, BigNumberish, BigNumberish]
+    values: [
+      BigNumberish,
+      string,
+      string,
+      string,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      string,
+      BigNumberish
+    ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateBidStatus",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "voteBid",
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "bidCount", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "bidVoteCounts",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "bidsByProposal",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "getBid", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getBidsByProposal",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "getMyBids", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "getVotes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasVoted", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "proposalToBids",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "submitBid", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "updateBidStatus",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "voteBid", data: BytesLike): Result;
+}
+
+export namespace BidStatusUpdatedEvent {
+  export type InputTuple = [bidId: BigNumberish, status: BigNumberish];
+  export type OutputTuple = [bidId: bigint, status: bigint];
+  export interface OutputObject {
+    bidId: bigint;
+    status: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace BidSubmittedEvent {
   export type InputTuple = [
-    id: BigNumberish,
+    bidId: BigNumberish,
     proposalId: BigNumberish,
-    bidder: AddressLike,
-    coverageOffer: BigNumberish,
-    premiumOffer: BigNumberish,
-    timestamp: BigNumberish
+    company: AddressLike
   ];
   export type OutputTuple = [
-    id: bigint,
+    bidId: bigint,
     proposalId: bigint,
-    bidder: string,
-    coverageOffer: bigint,
-    premiumOffer: bigint,
-    timestamp: bigint
+    company: string
   ];
   export interface OutputObject {
-    id: bigint;
+    bidId: bigint;
     proposalId: bigint;
-    bidder: string;
-    coverageOffer: bigint;
-    premiumOffer: bigint;
-    timestamp: bigint;
+    company: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -149,11 +207,11 @@ export namespace BidSubmittedEvent {
 }
 
 export namespace BidVotedEvent {
-  export type InputTuple = [bidId: BigNumberish, voter: AddressLike];
-  export type OutputTuple = [bidId: bigint, voter: string];
+  export type InputTuple = [bidId: BigNumberish, user: AddressLike];
+  export type OutputTuple = [bidId: bigint, user: string];
   export interface OutputObject {
     bidId: bigint;
-    voter: string;
+    user: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -204,28 +262,45 @@ export interface FunditBid extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  bidCount: TypedContractMethod<[], [bigint], "view">;
-
-  bidVoteCounts: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
-
   bids: TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [bigint, bigint, string, bigint, bigint, bigint] & {
-        id: bigint;
+      [
+        string,
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
+        company: string;
         proposalId: bigint;
-        bidder: string;
-        coverageOffer: bigint;
-        premiumOffer: bigint;
-        timestamp: bigint;
+        companyName: string;
+        planTitle: string;
+        planType: string;
+        outpatientCoveragePerVisit: bigint;
+        inpatientCoverage: bigint;
+        nonCoveredCoverage: bigint;
+        monthlyPremium: bigint;
+        contractPeriod: bigint;
+        ageEligibility: bigint;
+        occupationEligibility: string;
+        voteCount: bigint;
+        minVotes: bigint;
+        status: bigint;
+        createdAt: bigint;
       }
     ],
-    "view"
-  >;
-
-  bidsByProposal: TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
-    [bigint],
     "view"
   >;
 
@@ -237,22 +312,47 @@ export interface FunditBid extends BaseContract {
 
   getBidsByProposal: TypedContractMethod<
     [proposalId: BigNumberish],
-    [FunditBid.BidStructOutput[]],
+    [bigint[]],
     "view"
   >;
 
+  getMyBids: TypedContractMethod<[company: AddressLike], [bigint[]], "view">;
+
+  getVotes: TypedContractMethod<[bidId: BigNumberish], [bigint], "view">;
+
   hasVoted: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: BigNumberish, arg1: AddressLike],
     [boolean],
+    "view"
+  >;
+
+  proposalToBids: TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
     "view"
   >;
 
   submitBid: TypedContractMethod<
     [
       proposalId: BigNumberish,
-      coverageOffer: BigNumberish,
-      premiumOffer: BigNumberish
+      companyName: string,
+      planTitle: string,
+      planType: string,
+      outpatientCoveragePerVisit: BigNumberish,
+      inpatientCoverage: BigNumberish,
+      nonCoveredCoverage: BigNumberish,
+      monthlyPremium: BigNumberish,
+      contractPeriod: BigNumberish,
+      ageEligibility: BigNumberish,
+      occupationEligibility: string,
+      minVotes: BigNumberish
     ],
+    [bigint],
+    "nonpayable"
+  >;
+
+  updateBidStatus: TypedContractMethod<
+    [bidId: BigNumberish, status: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -264,32 +364,46 @@ export interface FunditBid extends BaseContract {
   ): T;
 
   getFunction(
-    nameOrSignature: "bidCount"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "bidVoteCounts"
-  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
-  getFunction(
     nameOrSignature: "bids"
   ): TypedContractMethod<
     [arg0: BigNumberish],
     [
-      [bigint, bigint, string, bigint, bigint, bigint] & {
-        id: bigint;
+      [
+        string,
+        bigint,
+        string,
+        string,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        bigint,
+        string,
+        bigint,
+        bigint,
+        bigint,
+        bigint
+      ] & {
+        company: string;
         proposalId: bigint;
-        bidder: string;
-        coverageOffer: bigint;
-        premiumOffer: bigint;
-        timestamp: bigint;
+        companyName: string;
+        planTitle: string;
+        planType: string;
+        outpatientCoveragePerVisit: bigint;
+        inpatientCoverage: bigint;
+        nonCoveredCoverage: bigint;
+        monthlyPremium: bigint;
+        contractPeriod: bigint;
+        ageEligibility: bigint;
+        occupationEligibility: string;
+        voteCount: bigint;
+        minVotes: bigint;
+        status: bigint;
+        createdAt: bigint;
       }
     ],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "bidsByProposal"
-  ): TypedContractMethod<
-    [arg0: BigNumberish, arg1: BigNumberish],
-    [bigint],
     "view"
   >;
   getFunction(
@@ -301,16 +415,25 @@ export interface FunditBid extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "getBidsByProposal"
-  ): TypedContractMethod<
-    [proposalId: BigNumberish],
-    [FunditBid.BidStructOutput[]],
-    "view"
-  >;
+  ): TypedContractMethod<[proposalId: BigNumberish], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getMyBids"
+  ): TypedContractMethod<[company: AddressLike], [bigint[]], "view">;
+  getFunction(
+    nameOrSignature: "getVotes"
+  ): TypedContractMethod<[bidId: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "hasVoted"
   ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
+    [arg0: BigNumberish, arg1: AddressLike],
     [boolean],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "proposalToBids"
+  ): TypedContractMethod<
+    [arg0: BigNumberish, arg1: BigNumberish],
+    [bigint],
     "view"
   >;
   getFunction(
@@ -318,9 +441,25 @@ export interface FunditBid extends BaseContract {
   ): TypedContractMethod<
     [
       proposalId: BigNumberish,
-      coverageOffer: BigNumberish,
-      premiumOffer: BigNumberish
+      companyName: string,
+      planTitle: string,
+      planType: string,
+      outpatientCoveragePerVisit: BigNumberish,
+      inpatientCoverage: BigNumberish,
+      nonCoveredCoverage: BigNumberish,
+      monthlyPremium: BigNumberish,
+      contractPeriod: BigNumberish,
+      ageEligibility: BigNumberish,
+      occupationEligibility: string,
+      minVotes: BigNumberish
     ],
+    [bigint],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "updateBidStatus"
+  ): TypedContractMethod<
+    [bidId: BigNumberish, status: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -328,6 +467,13 @@ export interface FunditBid extends BaseContract {
     nameOrSignature: "voteBid"
   ): TypedContractMethod<[bidId: BigNumberish], [void], "nonpayable">;
 
+  getEvent(
+    key: "BidStatusUpdated"
+  ): TypedContractEvent<
+    BidStatusUpdatedEvent.InputTuple,
+    BidStatusUpdatedEvent.OutputTuple,
+    BidStatusUpdatedEvent.OutputObject
+  >;
   getEvent(
     key: "BidSubmitted"
   ): TypedContractEvent<
@@ -344,7 +490,18 @@ export interface FunditBid extends BaseContract {
   >;
 
   filters: {
-    "BidSubmitted(uint256,uint256,address,uint256,uint256,uint256)": TypedContractEvent<
+    "BidStatusUpdated(uint256,uint8)": TypedContractEvent<
+      BidStatusUpdatedEvent.InputTuple,
+      BidStatusUpdatedEvent.OutputTuple,
+      BidStatusUpdatedEvent.OutputObject
+    >;
+    BidStatusUpdated: TypedContractEvent<
+      BidStatusUpdatedEvent.InputTuple,
+      BidStatusUpdatedEvent.OutputTuple,
+      BidStatusUpdatedEvent.OutputObject
+    >;
+
+    "BidSubmitted(uint256,uint256,address)": TypedContractEvent<
       BidSubmittedEvent.InputTuple,
       BidSubmittedEvent.OutputTuple,
       BidSubmittedEvent.OutputObject

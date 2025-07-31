@@ -1,104 +1,84 @@
 import express from "express";
 import {
   getTokenBalance,
-  transferToken,
   claimReward,
   getRewardHistory,
-  getRewardHistoryLength,
-  getRewardHistoryItem,
+  getClaimedReward,
 } from "../services/token.service";
-import prisma from "@utils/prisma";
 
 const router = express.Router();
 
-// ✅ GET /token/balance/:address
+/**
+ * ✅ GET /token/balance/:address
+ * → 해당 주소의 FDT 잔액 조회
+ */
 router.get("/balance/:address", async (req, res) => {
   try {
-    const { address } = req.params;
+    const address = req.params.address as `0x${string}`;
     const balance = await getTokenBalance(address);
-    res.json({ balance });
-  } catch (err: any) {
-    console.error("❌ GET /token/balance error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    res.json({ address, balance: balance.toString() });
+  } catch (err) {
+    console.error("🔴 [GET /token/balance] Error:", err);
+    res.status(500).json({ error: "Failed to fetch token balance" });
   }
 });
 
-// ✅ POST /token/transfer
-router.post("/transfer", async (req, res) => {
-  try {
-    const { to, amount } = req.body;
-    if (!to || !amount) {
-      return res.status(400).json({ error: "Missing 'to' or 'amount'" });
-    }
-
-    const txHash = await transferToken(to, amount);
-    res.json({ txHash });
-  } catch (err: any) {
-    console.error("❌ POST /token/transfer error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
-  }
-});
-
-// ✅ POST /token/claim
-router.post("/claim", async (req, res) => {
-  try {
-    const { address, amount } = req.body;
-    if (!address || !amount) {
-      return res.status(400).json({ error: "Missing 'address' or 'amount'" });
-    }
-
-    // ① 온체인 리워드 전송
-    const txHash = await claimReward(address, amount);
-
-    // ② DB에도 기록
-    await prisma.rewardEvent.create({
-      data: {
-        userId: address,
-        amount: BigInt(amount),
-        timestamp: BigInt(Math.floor(Date.now() / 1000)),
-      },
-    });
-
-    res.json({ txHash });
-  } catch (err: any) {
-    console.error("❌ POST /token/claim error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
-  }
-});
-
-// ✅ GET /token/reward-history/:address
+/**
+ * ✅ GET /token/reward-history/:address
+ * → 해당 주소의 수령 히스토리 (DB 기준)
+ */
 router.get("/reward-history/:address", async (req, res) => {
   try {
-    const { address } = req.params;
+    const address = req.params.address as `0x${string}`;
     const history = await getRewardHistory(address);
-    res.json({ history });
-  } catch (err: any) {
-    console.error("❌ GET /token/reward-history error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    const formatted = history.map((item) => ({
+      timestamp: item.createdAt.toISOString(),
+      amount: item.amount,
+      txHash: item.txHash,
+    }));
+    res.json(formatted);
+  } catch (err) {
+    console.error("🔴 [GET /token/reward-history] Error:", err);
+    res.status(500).json({ error: "Failed to fetch reward history" });
   }
 });
 
-// ✅ GET /token/reward-history-length/:address
-router.get("/reward-history-length/:address", async (req, res) => {
+/**
+ * ✅ GET /token/claimed/:address
+ * → 누적 수령량 (on-chain)
+ */
+router.get("/claimed/:address", async (req, res) => {
   try {
-    const { address } = req.params;
-    const length = await getRewardHistoryLength(address);
-    res.json({ length });
-  } catch (err: any) {
-    console.error("❌ GET /token/reward-history-length error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    const address = req.params.address as `0x${string}`;
+    const claimed = await getClaimedReward(address);
+    res.json({ address, claimed: claimed.toString() });
+  } catch (err) {
+    console.error("🔴 [GET /token/claimed] Error:", err);
+    res.status(500).json({ error: "Failed to fetch claimed reward" });
   }
 });
 
-// ✅ GET /token/reward-history-item/:address/:index
-router.get("/reward-history-item/:address/:index", async (req, res) => {
+/**
+ * ✅ POST /token/claim
+ * → 사용자에게 토큰 지급 (관리자 권한 필요)
+ * Body: { user: "0x...", amount: "1000000000000000000" }
+ */
+router.post("/claim", async (req, res) => {
   try {
-    const { address, index } = req.params;
-    const item = await getRewardHistoryItem(address, parseInt(index));
-    res.json(item);
-  } catch (err: any) {
-    console.error("❌ GET /token/reward-history-item error:", err);
-    res.status(500).json({ error: err.message || "Internal server error" });
+    const { user, amount } = req.body;
+    if (!user || !amount) {
+      return res.status(400).json({ error: "Missing user or amount" });
+    }
+
+    const txHash = await claimReward({
+      user,
+      amount: BigInt(amount),
+    });
+
+    res.json({ success: true, txHash });
+  } catch (err) {
+    console.error("🔴 [POST /token/claim] Error:", err);
+    res.status(500).json({ error: "Failed to claim reward" });
   }
 });
 

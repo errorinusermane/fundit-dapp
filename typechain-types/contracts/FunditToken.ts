@@ -29,16 +29,14 @@ export interface FunditTokenInterface extends Interface {
       | "allowance"
       | "approve"
       | "balanceOf"
+      | "claimReward"
+      | "claimedRewards"
       | "decimals"
-      | "getRewardHistoryItem"
-      | "getRewardHistoryLength"
-      | "mintReward"
-      | "minter"
+      | "getClaimedReward"
+      | "mint"
       | "name"
       | "owner"
       | "renounceOwnership"
-      | "rewardHistory"
-      | "setMinter"
       | "symbol"
       | "totalSupply"
       | "transfer"
@@ -49,8 +47,8 @@ export interface FunditTokenInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "Approval"
-      | "MinterUpdated"
       | "OwnershipTransferred"
+      | "RewardClaimed"
       | "Transfer"
   ): EventFragment;
 
@@ -66,33 +64,28 @@ export interface FunditTokenInterface extends Interface {
     functionFragment: "balanceOf",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "getRewardHistoryItem",
+    functionFragment: "claimReward",
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getRewardHistoryLength",
+    functionFragment: "claimedRewards",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getClaimedReward",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "mintReward",
+    functionFragment: "mint",
     values: [AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rewardHistory",
-    values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setMinter",
-    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -115,28 +108,26 @@ export interface FunditTokenInterface extends Interface {
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "claimedRewards",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getRewardHistoryItem",
+    functionFragment: "getClaimedReward",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRewardHistoryLength",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "mintReward", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "rewardHistory",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -171,12 +162,12 @@ export namespace ApprovalEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace MinterUpdatedEvent {
-  export type InputTuple = [oldMinter: AddressLike, newMinter: AddressLike];
-  export type OutputTuple = [oldMinter: string, newMinter: string];
+export namespace OwnershipTransferredEvent {
+  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
+  export type OutputTuple = [previousOwner: string, newOwner: string];
   export interface OutputObject {
-    oldMinter: string;
-    newMinter: string;
+    previousOwner: string;
+    newOwner: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -184,12 +175,12 @@ export namespace MinterUpdatedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace OwnershipTransferredEvent {
-  export type InputTuple = [previousOwner: AddressLike, newOwner: AddressLike];
-  export type OutputTuple = [previousOwner: string, newOwner: string];
+export namespace RewardClaimedEvent {
+  export type InputTuple = [user: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [user: string, amount: bigint];
   export interface OutputObject {
-    previousOwner: string;
-    newOwner: string;
+    user: string;
+    amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -272,41 +263,29 @@ export interface FunditToken extends BaseContract {
 
   balanceOf: TypedContractMethod<[account: AddressLike], [bigint], "view">;
 
-  decimals: TypedContractMethod<[], [bigint], "view">;
-
-  getRewardHistoryItem: TypedContractMethod<
-    [user: AddressLike, index: BigNumberish],
-    [[bigint, bigint] & { amount: bigint; timestamp: bigint }],
-    "view"
-  >;
-
-  getRewardHistoryLength: TypedContractMethod<
-    [user: AddressLike],
-    [bigint],
-    "view"
-  >;
-
-  mintReward: TypedContractMethod<
-    [to: AddressLike, amount: BigNumberish],
+  claimReward: TypedContractMethod<
+    [user: AddressLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
 
-  minter: TypedContractMethod<[], [string], "view">;
+  claimedRewards: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+
+  decimals: TypedContractMethod<[], [bigint], "view">;
+
+  getClaimedReward: TypedContractMethod<[user: AddressLike], [bigint], "view">;
+
+  mint: TypedContractMethod<
+    [to: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   name: TypedContractMethod<[], [string], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
-
-  rewardHistory: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [[bigint, bigint] & { amount: bigint; timestamp: bigint }],
-    "view"
-  >;
-
-  setMinter: TypedContractMethod<[_minter: AddressLike], [void], "nonpayable">;
 
   symbol: TypedContractMethod<[], [string], "view">;
 
@@ -352,28 +331,28 @@ export interface FunditToken extends BaseContract {
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[account: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "claimReward"
+  ): TypedContractMethod<
+    [user: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "claimedRewards"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "decimals"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "getRewardHistoryItem"
-  ): TypedContractMethod<
-    [user: AddressLike, index: BigNumberish],
-    [[bigint, bigint] & { amount: bigint; timestamp: bigint }],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "getRewardHistoryLength"
+    nameOrSignature: "getClaimedReward"
   ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: "mintReward"
+    nameOrSignature: "mint"
   ): TypedContractMethod<
     [to: AddressLike, amount: BigNumberish],
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "minter"
-  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
@@ -383,16 +362,6 @@ export interface FunditToken extends BaseContract {
   getFunction(
     nameOrSignature: "renounceOwnership"
   ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "rewardHistory"
-  ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [[bigint, bigint] & { amount: bigint; timestamp: bigint }],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "setMinter"
-  ): TypedContractMethod<[_minter: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "symbol"
   ): TypedContractMethod<[], [string], "view">;
@@ -425,18 +394,18 @@ export interface FunditToken extends BaseContract {
     ApprovalEvent.OutputObject
   >;
   getEvent(
-    key: "MinterUpdated"
-  ): TypedContractEvent<
-    MinterUpdatedEvent.InputTuple,
-    MinterUpdatedEvent.OutputTuple,
-    MinterUpdatedEvent.OutputObject
-  >;
-  getEvent(
     key: "OwnershipTransferred"
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
+  >;
+  getEvent(
+    key: "RewardClaimed"
+  ): TypedContractEvent<
+    RewardClaimedEvent.InputTuple,
+    RewardClaimedEvent.OutputTuple,
+    RewardClaimedEvent.OutputObject
   >;
   getEvent(
     key: "Transfer"
@@ -458,17 +427,6 @@ export interface FunditToken extends BaseContract {
       ApprovalEvent.OutputObject
     >;
 
-    "MinterUpdated(address,address)": TypedContractEvent<
-      MinterUpdatedEvent.InputTuple,
-      MinterUpdatedEvent.OutputTuple,
-      MinterUpdatedEvent.OutputObject
-    >;
-    MinterUpdated: TypedContractEvent<
-      MinterUpdatedEvent.InputTuple,
-      MinterUpdatedEvent.OutputTuple,
-      MinterUpdatedEvent.OutputObject
-    >;
-
     "OwnershipTransferred(address,address)": TypedContractEvent<
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
@@ -478,6 +436,17 @@ export interface FunditToken extends BaseContract {
       OwnershipTransferredEvent.InputTuple,
       OwnershipTransferredEvent.OutputTuple,
       OwnershipTransferredEvent.OutputObject
+    >;
+
+    "RewardClaimed(address,uint256)": TypedContractEvent<
+      RewardClaimedEvent.InputTuple,
+      RewardClaimedEvent.OutputTuple,
+      RewardClaimedEvent.OutputObject
+    >;
+    RewardClaimed: TypedContractEvent<
+      RewardClaimedEvent.InputTuple,
+      RewardClaimedEvent.OutputTuple,
+      RewardClaimedEvent.OutputObject
     >;
 
     "Transfer(address,address,uint256)": TypedContractEvent<

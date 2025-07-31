@@ -21,7 +21,7 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../../common";
+} from "../common";
 
 export declare namespace FunditContract {
   export type InsuranceContractStruct = {
@@ -30,10 +30,10 @@ export declare namespace FunditContract {
     bidId: BigNumberish;
     user: AddressLike;
     company: AddressLike;
-    coverageAmount: BigNumberish;
-    premiumAmount: BigNumberish;
-    startTime: BigNumberish;
-    endTime: BigNumberish;
+    monthlyPremium: BigNumberish;
+    contractPeriod: BigNumberish;
+    startDate: BigNumberish;
+    autoPayment: boolean;
     status: BigNumberish;
   };
 
@@ -43,10 +43,10 @@ export declare namespace FunditContract {
     bidId: bigint,
     user: string,
     company: string,
-    coverageAmount: bigint,
-    premiumAmount: bigint,
-    startTime: bigint,
-    endTime: bigint,
+    monthlyPremium: bigint,
+    contractPeriod: bigint,
+    startDate: bigint,
+    autoPayment: boolean,
     status: bigint
   ] & {
     id: bigint;
@@ -54,10 +54,10 @@ export declare namespace FunditContract {
     bidId: bigint;
     user: string;
     company: string;
-    coverageAmount: bigint;
-    premiumAmount: bigint;
-    startTime: bigint;
-    endTime: bigint;
+    monthlyPremium: bigint;
+    contractPeriod: bigint;
+    startDate: bigint;
+    autoPayment: boolean;
     status: bigint;
   };
 }
@@ -65,42 +65,32 @@ export declare namespace FunditContract {
 export interface FunditContractInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "bidContract"
-      | "cancelContract"
-      | "completeContract"
-      | "confirmContractIfPopular"
-      | "contractCount"
+      | "confirmContract"
       | "contracts"
       | "contractsByCompany"
       | "contractsByUser"
+      | "getAllContracts"
       | "getContract"
       | "getContractsByCompany"
       | "getContractsByUser"
-      | "hasJoined"
-      | "voteThreshold"
+      | "nextContractId"
+      | "toggleAutoPayment"
   ): FunctionFragment;
 
-  getEvent(nameOrSignatureOrTopic: "ContractConfirmed"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "AutoPaymentToggled" | "ContractConfirmed"
+  ): EventFragment;
 
   encodeFunctionData(
-    functionFragment: "bidContract",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "cancelContract",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "completeContract",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "confirmContractIfPopular",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "contractCount",
-    values?: undefined
+    functionFragment: "confirmContract",
+    values: [
+      BigNumberish,
+      BigNumberish,
+      AddressLike,
+      AddressLike,
+      BigNumberish,
+      BigNumberish
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "contracts",
@@ -115,6 +105,10 @@ export interface FunditContractInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "getAllContracts",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "getContract",
     values: [BigNumberish]
   ): string;
@@ -127,32 +121,16 @@ export interface FunditContractInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "hasJoined",
-    values: [AddressLike, BigNumberish]
+    functionFragment: "nextContractId",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "voteThreshold",
-    values?: undefined
+    functionFragment: "toggleAutoPayment",
+    values: [BigNumberish]
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "bidContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "completeContract",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "confirmContractIfPopular",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "contractCount",
+    functionFragment: "confirmContract",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "contracts", data: BytesLike): Result;
@@ -162,6 +140,10 @@ export interface FunditContractInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "contractsByUser",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllContracts",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -176,40 +158,40 @@ export interface FunditContractInterface extends Interface {
     functionFragment: "getContractsByUser",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "hasJoined", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "voteThreshold",
+    functionFragment: "nextContractId",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "toggleAutoPayment",
+    data: BytesLike
+  ): Result;
+}
+
+export namespace AutoPaymentToggledEvent {
+  export type InputTuple = [contractId: BigNumberish, enabled: boolean];
+  export type OutputTuple = [contractId: bigint, enabled: boolean];
+  export interface OutputObject {
+    contractId: bigint;
+    enabled: boolean;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export namespace ContractConfirmedEvent {
   export type InputTuple = [
     contractId: BigNumberish,
-    proposalId: BigNumberish,
-    bidId: BigNumberish,
     user: AddressLike,
-    company: AddressLike,
-    startTime: BigNumberish,
-    endTime: BigNumberish
+    company: AddressLike
   ];
-  export type OutputTuple = [
-    contractId: bigint,
-    proposalId: bigint,
-    bidId: bigint,
-    user: string,
-    company: string,
-    startTime: bigint,
-    endTime: bigint
-  ];
+  export type OutputTuple = [contractId: bigint, user: string, company: string];
   export interface OutputObject {
     contractId: bigint;
-    proposalId: bigint;
-    bidId: bigint;
     user: string;
     company: string;
-    startTime: bigint;
-    endTime: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -260,27 +242,18 @@ export interface FunditContract extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  bidContract: TypedContractMethod<[], [string], "view">;
-
-  cancelContract: TypedContractMethod<
-    [contractId: BigNumberish],
+  confirmContract: TypedContractMethod<
+    [
+      _proposalId: BigNumberish,
+      _bidId: BigNumberish,
+      _user: AddressLike,
+      _company: AddressLike,
+      _monthlyPremium: BigNumberish,
+      _contractPeriod: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
-
-  completeContract: TypedContractMethod<
-    [contractId: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  confirmContractIfPopular: TypedContractMethod<
-    [bidId: BigNumberish, duration: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  contractCount: TypedContractMethod<[], [bigint], "view">;
 
   contracts: TypedContractMethod<
     [arg0: BigNumberish],
@@ -294,7 +267,7 @@ export interface FunditContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        bigint,
+        boolean,
         bigint
       ] & {
         id: bigint;
@@ -302,10 +275,10 @@ export interface FunditContract extends BaseContract {
         bidId: bigint;
         user: string;
         company: string;
-        coverageAmount: bigint;
-        premiumAmount: bigint;
-        startTime: bigint;
-        endTime: bigint;
+        monthlyPremium: bigint;
+        contractPeriod: bigint;
+        startDate: bigint;
+        autoPayment: boolean;
         status: bigint;
       }
     ],
@@ -324,55 +297,52 @@ export interface FunditContract extends BaseContract {
     "view"
   >;
 
+  getAllContracts: TypedContractMethod<[], [bigint[]], "view">;
+
   getContract: TypedContractMethod<
-    [contractId: BigNumberish],
+    [_contractId: BigNumberish],
     [FunditContract.InsuranceContractStructOutput],
     "view"
   >;
 
   getContractsByCompany: TypedContractMethod<
-    [company: AddressLike],
-    [FunditContract.InsuranceContractStructOutput[]],
+    [_company: AddressLike],
+    [bigint[]],
     "view"
   >;
 
   getContractsByUser: TypedContractMethod<
-    [user: AddressLike],
-    [FunditContract.InsuranceContractStructOutput[]],
+    [_user: AddressLike],
+    [bigint[]],
     "view"
   >;
 
-  hasJoined: TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [boolean],
-    "view"
-  >;
+  nextContractId: TypedContractMethod<[], [bigint], "view">;
 
-  voteThreshold: TypedContractMethod<[], [bigint], "view">;
+  toggleAutoPayment: TypedContractMethod<
+    [_contractId: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "bidContract"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "cancelContract"
-  ): TypedContractMethod<[contractId: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "completeContract"
-  ): TypedContractMethod<[contractId: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "confirmContractIfPopular"
+    nameOrSignature: "confirmContract"
   ): TypedContractMethod<
-    [bidId: BigNumberish, duration: BigNumberish],
+    [
+      _proposalId: BigNumberish,
+      _bidId: BigNumberish,
+      _user: AddressLike,
+      _company: AddressLike,
+      _monthlyPremium: BigNumberish,
+      _contractPeriod: BigNumberish
+    ],
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "contractCount"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "contracts"
   ): TypedContractMethod<
@@ -387,7 +357,7 @@ export interface FunditContract extends BaseContract {
         bigint,
         bigint,
         bigint,
-        bigint,
+        boolean,
         bigint
       ] & {
         id: bigint;
@@ -395,10 +365,10 @@ export interface FunditContract extends BaseContract {
         bidId: bigint;
         user: string;
         company: string;
-        coverageAmount: bigint;
-        premiumAmount: bigint;
-        startTime: bigint;
-        endTime: bigint;
+        monthlyPremium: bigint;
+        contractPeriod: bigint;
+        startDate: bigint;
+        autoPayment: boolean;
         status: bigint;
       }
     ],
@@ -419,37 +389,35 @@ export interface FunditContract extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "getAllContracts"
+  ): TypedContractMethod<[], [bigint[]], "view">;
+  getFunction(
     nameOrSignature: "getContract"
   ): TypedContractMethod<
-    [contractId: BigNumberish],
+    [_contractId: BigNumberish],
     [FunditContract.InsuranceContractStructOutput],
     "view"
   >;
   getFunction(
     nameOrSignature: "getContractsByCompany"
-  ): TypedContractMethod<
-    [company: AddressLike],
-    [FunditContract.InsuranceContractStructOutput[]],
-    "view"
-  >;
+  ): TypedContractMethod<[_company: AddressLike], [bigint[]], "view">;
   getFunction(
     nameOrSignature: "getContractsByUser"
-  ): TypedContractMethod<
-    [user: AddressLike],
-    [FunditContract.InsuranceContractStructOutput[]],
-    "view"
-  >;
+  ): TypedContractMethod<[_user: AddressLike], [bigint[]], "view">;
   getFunction(
-    nameOrSignature: "hasJoined"
-  ): TypedContractMethod<
-    [arg0: AddressLike, arg1: BigNumberish],
-    [boolean],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "voteThreshold"
+    nameOrSignature: "nextContractId"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "toggleAutoPayment"
+  ): TypedContractMethod<[_contractId: BigNumberish], [void], "nonpayable">;
 
+  getEvent(
+    key: "AutoPaymentToggled"
+  ): TypedContractEvent<
+    AutoPaymentToggledEvent.InputTuple,
+    AutoPaymentToggledEvent.OutputTuple,
+    AutoPaymentToggledEvent.OutputObject
+  >;
   getEvent(
     key: "ContractConfirmed"
   ): TypedContractEvent<
@@ -459,7 +427,18 @@ export interface FunditContract extends BaseContract {
   >;
 
   filters: {
-    "ContractConfirmed(uint256,uint256,uint256,address,address,uint256,uint256)": TypedContractEvent<
+    "AutoPaymentToggled(uint256,bool)": TypedContractEvent<
+      AutoPaymentToggledEvent.InputTuple,
+      AutoPaymentToggledEvent.OutputTuple,
+      AutoPaymentToggledEvent.OutputObject
+    >;
+    AutoPaymentToggled: TypedContractEvent<
+      AutoPaymentToggledEvent.InputTuple,
+      AutoPaymentToggledEvent.OutputTuple,
+      AutoPaymentToggledEvent.OutputObject
+    >;
+
+    "ContractConfirmed(uint256,address,address)": TypedContractEvent<
       ContractConfirmedEvent.InputTuple,
       ContractConfirmedEvent.OutputTuple,
       ContractConfirmedEvent.OutputObject

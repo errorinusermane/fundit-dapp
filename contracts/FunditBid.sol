@@ -1,89 +1,126 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.18;
 
 contract FunditBid {
-    uint256 public bidCount;
+    uint256 private bidCounter;
+
+    enum BidStatus {
+        ACTIVE,
+        SELECTED,
+        REJECTED
+    }
 
     struct Bid {
-        uint256 id;
+        address company;
         uint256 proposalId;
-        address bidder;
-        uint256 coverageOffer;
-        uint256 premiumOffer;
-        uint256 timestamp;
+        string companyName;
+        string planTitle;
+        string planType;
+        uint256 outpatientCoveragePerVisit;
+        uint256 inpatientCoverage;
+        uint256 nonCoveredCoverage;
+        uint256 monthlyPremium;
+        uint256 contractPeriod;
+        uint256 ageEligibility;
+        string occupationEligibility;
+        uint256 voteCount;
+        uint256 minVotes;
+        BidStatus status;
+        uint256 createdAt;
     }
 
-    mapping(uint256 => Bid) public bids; // bidId → Bid
-    mapping(uint256 => uint256[]) public bidsByProposal; // proposalId → bidIds
-    mapping(uint256 => uint256) public bidVoteCounts; // bidId → 투표 수
-    mapping(address => mapping(uint256 => bool)) public hasVoted; // user → bidId → 중복 방지
+    mapping(uint256 => Bid) public bids;
+    mapping(uint256 => uint256[]) public proposalToBids;
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
 
-    event BidSubmitted(
-        uint256 indexed id,
-        uint256 indexed proposalId,
-        address indexed bidder,
-        uint256 coverageOffer,
-        uint256 premiumOffer,
-        uint256 timestamp
-    );
+    event BidSubmitted(uint256 bidId, uint256 proposalId, address indexed company);
+    event BidVoted(uint256 bidId, address indexed user);
+    event BidStatusUpdated(uint256 bidId, BidStatus status);
 
-    event BidVoted(
-        uint256 indexed bidId,
-        address indexed voter
-    );
-
-    /// @notice 기업이 특정 보험 제안에 입찰을 등록
     function submitBid(
         uint256 proposalId,
-        uint256 coverageOffer,
-        uint256 premiumOffer
-    ) external {
-        bidCount += 1;
+        string memory companyName,
+        string memory planTitle,
+        string memory planType,
+        uint256 outpatientCoveragePerVisit,
+        uint256 inpatientCoverage,
+        uint256 nonCoveredCoverage,
+        uint256 monthlyPremium,
+        uint256 contractPeriod,
+        uint256 ageEligibility,
+        string memory occupationEligibility,
+        uint256 minVotes
+    ) external returns (uint256) {
+        bidCounter++;
 
-        bids[bidCount] = Bid({
-            id: bidCount,
-            proposalId: proposalId,
-            bidder: msg.sender,
-            coverageOffer: coverageOffer,
-            premiumOffer: premiumOffer,
-            timestamp: block.timestamp
-        });
+        Bid storage newBid = bids[bidCounter];
+        newBid.company = msg.sender;
+        newBid.proposalId = proposalId;
+        newBid.companyName = companyName;
+        newBid.planTitle = planTitle;
+        newBid.planType = planType;
+        newBid.outpatientCoveragePerVisit = outpatientCoveragePerVisit;
+        newBid.inpatientCoverage = inpatientCoverage;
+        newBid.nonCoveredCoverage = nonCoveredCoverage;
+        newBid.monthlyPremium = monthlyPremium;
+        newBid.contractPeriod = contractPeriod;
+        newBid.ageEligibility = ageEligibility;
+        newBid.occupationEligibility = occupationEligibility;
+        newBid.voteCount = 0;
+        newBid.minVotes = minVotes;
+        newBid.status = BidStatus.ACTIVE;
+        newBid.createdAt = block.timestamp;
 
-        bidsByProposal[proposalId].push(bidCount);
+        proposalToBids[proposalId].push(bidCounter);
 
-        emit BidSubmitted(
-            bidCount,
-            proposalId,
-            msg.sender,
-            coverageOffer,
-            premiumOffer,
-            block.timestamp
-        );
+        emit BidSubmitted(bidCounter, proposalId, msg.sender);
+        return bidCounter;
     }
 
-    /// @notice 사용자가 특정 입찰안에 투표 (중복 불가)
     function voteBid(uint256 bidId) external {
-        require(bids[bidId].id != 0, "Invalid bidId");
-        require(!hasVoted[msg.sender][bidId], "Already voted");
+        require(!hasVoted[bidId][msg.sender], "Already voted for this bid");
 
-        hasVoted[msg.sender][bidId] = true;
-        bidVoteCounts[bidId]++;
+        bids[bidId].voteCount += 1;
+        hasVoted[bidId][msg.sender] = true;
 
         emit BidVoted(bidId, msg.sender);
     }
 
-    /// @notice 특정 제안(proposalId)에 달린 입찰 목록 조회
-    function getBidsByProposal(uint256 proposalId) external view returns (Bid[] memory) {
-        uint256[] memory bidIds = bidsByProposal[proposalId];
-        Bid[] memory result = new Bid[](bidIds.length);
-        for (uint256 i = 0; i < bidIds.length; i++) {
-            result[i] = bids[bidIds[i]];
-        }
-        return result;
+    function getBidsByProposal(uint256 proposalId) external view returns (uint256[] memory) {
+        return proposalToBids[proposalId];
     }
 
-    /// @notice 특정 입찰 ID 조회
+    function getVotes(uint256 bidId) external view returns (uint256) {
+        return bids[bidId].voteCount;
+    }
+
+    function updateBidStatus(uint256 bidId, BidStatus status) external {
+        // 🔒 필요 시 관리자 권한만 허용
+        bids[bidId].status = status;
+        emit BidStatusUpdated(bidId, status);
+    }
+
     function getBid(uint256 bidId) external view returns (Bid memory) {
         return bids[bidId];
+    }
+
+    function getMyBids(address company) external view returns (uint256[] memory) {
+        uint256 count;
+        for (uint256 i = 1; i <= bidCounter; i++) {
+            if (bids[i].company == company) {
+                count++;
+            }
+        }
+
+        uint256[] memory myBidIds = new uint256[](count);
+        uint256 index = 0;
+        for (uint256 i = 1; i <= bidCounter; i++) {
+            if (bids[i].company == company) {
+                myBidIds[index] = i;
+                index++;
+            }
+        }
+
+        return myBidIds;
     }
 }
