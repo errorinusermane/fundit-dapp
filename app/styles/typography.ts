@@ -4,9 +4,9 @@ const typography = {
   body: 14,
   small: 12,
   fontWeight: {
-    regular: "400",
-    medium: "500",
-    bold: "700",
+    regular: "400" as const,
+    medium: "500" as const,
+    bold: "700" as const,
   },
 };
 
