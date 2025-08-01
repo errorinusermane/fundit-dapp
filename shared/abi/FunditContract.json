@@ -1,358 +1,349 @@
-{
-  "_format": "hh-sol-artifact-1",
-  "contractName": "FunditContract",
-  "sourceName": "contracts/FunditContract.sol",
-  "abi": [
-    {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "contractId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "bool",
-          "name": "enabled",
-          "type": "bool"
-        }
-      ],
-      "name": "AutoPaymentToggled",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "contractId",
-          "type": "uint256"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "indexed": true,
-          "internalType": "address",
-          "name": "company",
-          "type": "address"
-        }
-      ],
-      "name": "ContractConfirmed",
-      "type": "event"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_proposalId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_bidId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "_user",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "_company",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_monthlyPremium",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_contractPeriod",
-          "type": "uint256"
-        }
-      ],
-      "name": "confirmContract",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "contracts",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "id",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "proposalId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "bidId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "address",
-          "name": "user",
-          "type": "address"
-        },
-        {
-          "internalType": "address",
-          "name": "company",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "monthlyPremium",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "contractPeriod",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "startDate",
-          "type": "uint256"
-        },
-        {
-          "internalType": "bool",
-          "name": "autoPayment",
-          "type": "bool"
-        },
-        {
-          "internalType": "enum FunditContract.ContractStatus",
-          "name": "status",
-          "type": "uint8"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "contractsByCompany",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "name": "contractsByUser",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getAllContracts",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_contractId",
-          "type": "uint256"
-        }
-      ],
-      "name": "getContract",
-      "outputs": [
-        {
-          "components": [
-            {
-              "internalType": "uint256",
-              "name": "id",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "proposalId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "bidId",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "user",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "company",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "monthlyPremium",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "contractPeriod",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "startDate",
-              "type": "uint256"
-            },
-            {
-              "internalType": "bool",
-              "name": "autoPayment",
-              "type": "bool"
-            },
-            {
-              "internalType": "enum FunditContract.ContractStatus",
-              "name": "status",
-              "type": "uint8"
-            }
-          ],
-          "internalType": "struct FunditContract.InsuranceContract",
-          "name": "",
-          "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_company",
-          "type": "address"
-        }
-      ],
-      "name": "getContractsByCompany",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
-          "name": "_user",
-          "type": "address"
-        }
-      ],
-      "name": "getContractsByUser",
-      "outputs": [
-        {
-          "internalType": "uint256[]",
-          "name": "",
-          "type": "uint256[]"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "nextContractId",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_contractId",
-          "type": "uint256"
-        }
-      ],
-      "name": "toggleAutoPayment",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    }
-  ],
-  "bytecode": "0x60808060405234601a57600160005561093790816100208239f35b600080fdfe6080604052600436101561001257600080fd5b60003560e01c806318d3ce961461073e578063474da79a146106925780634eca495f1461061b5780635797047c146105d157806358648588146105785780636b00cc871461049a5780636ebc8c861461032d5780639b4bc5301461030f578063b6f50f9b146102885763b94b46f71461008a57600080fd5b346102835760c0366003190112610283576044356001600160a01b03811690819003610283576064356001600160a01b038116908190036102835760005491600019831461026d578260016000940184556040516100e78161085a565b8181526101df600860208301926004358452604081016024358152606082018781526080830189815260a0840190608435825260c085019260a435845260e086019442865261010087019d8e5261012087019960008b528b600052600160205260406000209751885551600188015551600287015560018060a01b03905116600386019060018060a01b03166bffffffffffffffffffffffff60a01b82541617905560018060a01b03905116600485019060018060a01b03166bffffffffffffffffffffffff60a01b8254161790555160058401555160068301555160078201550195511515869060ff801983541691151516179055565b51936002851015610257577f944680b903deffeefdcb36f415b8c3eee48a3b2f9e757ad4114d14987ca6f0fa9160209160009661ff0082549160081b169061ff0019161790558386526002825261023981604088206108c7565b8486526003825261024d81604088206108c7565b604051908152a380f35b634e487b7160e01b600052602160045260246000fd5b634e487b7160e01b600052601160045260246000fd5b600080fd5b34610283576020366003190112610283576001600160a01b036102a961082c565b166000526003602052604060002060405190816020825491828152019160005260206000209060005b8181106102f9576102f5856102e98187038261088d565b604051918291826107e5565b0390f35b82548452602090930192600192830192016102d2565b34610283576000366003190112610283576020600054604051908152f35b3461028357602036600319011261028357600061012060405161034f8161085a565b8281528260208201528260408201528260608201528260808201528260a08201528260c08201528260e0820152826101008201520152600435600052600160205260406000206040516103a18161085a565b815481526001820154916020820192835260028101546040830190815260018060a01b03600383015416916060840192835260018060a01b036004820154169060808501918252600581015460a0860190815260068201549060c08701918252600860078401549360e0890194855201549360ff6101008901958181161515875260081c16966101208901966002891015610257576101409a6104989989526040519a518b525160208b01525160408a015260018060a01b03905116606089015260018060a01b0390511660808801525160a08701525160c08601525160e08501525115156101008401525161012083019061081f565bf35b3461028357602036600319011261028357600435806000526001602052604060002060018060a01b0360038201541633148015610562575b1561052c577fa4eaafe6255a2b6f95a509cf81b72845ef7dd58adb907b52e1bcefba3fd0ff579160ff60086040930161051b8282541615829060ff801983541691151516179055565b5416825191825215156020820152a1005b60405162461bcd60e51b815260206004820152600e60248201526d139bdd08185d5d1a1bdc9a5e995960921b6044820152606490fd5b5060048101546001600160a01b031633146104d2565b346102835760403660031901126102835761059161082c565b6001600160a01b0316600090815260026020526040902080546024359190821015610283576020916105c291610842565b90549060031b1c604051908152f35b34610283576040366003190112610283576105ea61082c565b6001600160a01b0316600090815260036020526040902080546024359190821015610283576020916105c291610842565b34610283576020366003190112610283576001600160a01b0361063c61082c565b166000526002602052604060002060405190816020825491828152019160005260206000209060005b81811061067c576102f5856102e98187038261088d565b8254845260209093019260019283019201610665565b346102835760203660031901126102835760043560005260016020526101406040600020610498815491600181015490600281015460018060a01b0360038301541660018060a01b036004840154166005840154916006850154936008600787015496015496604051998a5260208a015260408901526060880152608087015260a086015260c085015260e084015260ff8116151561010084015260ff61012084019160081c1661081f565b346102835760003660031901126102835760005460001981019081118061026d57610768826108af565b91610776604051938461088d565b808352601f19610785826108af565b013660208501376000825b61026d57818110156107db57600181019081811161026d5784518110156107c55760019160208260051b870101520182610790565b634e487b7160e01b600052603260045260246000fd5b604051806102f586825b602060408183019282815284518094520192019060005b8181106108095750505090565b82518452602093840193909201916001016107fc565b9060028210156102575752565b600435906001600160a01b038216820361028357565b80548210156107c55760005260206000200190600090565b610140810190811067ffffffffffffffff82111761087757604052565b634e487b7160e01b600052604160045260246000fd5b90601f8019910116810190811067ffffffffffffffff82111761087757604052565b67ffffffffffffffff81116108775760051b60200190565b805468010000000000000000811015610877576108e991600182018155610842565b819291549060031b91821b91600019901b191617905556fea26469706673582212209061e9f365bad9ddf9e47887a4d0eba0b442d47ea5457d667e40d31db9565dc364736f6c634300081a0033",
-  "deployedBytecode": "0x6080604052600436101561001257600080fd5b60003560e01c806318d3ce961461073e578063474da79a146106925780634eca495f1461061b5780635797047c146105d157806358648588146105785780636b00cc871461049a5780636ebc8c861461032d5780639b4bc5301461030f578063b6f50f9b146102885763b94b46f71461008a57600080fd5b346102835760c0366003190112610283576044356001600160a01b03811690819003610283576064356001600160a01b038116908190036102835760005491600019831461026d578260016000940184556040516100e78161085a565b8181526101df600860208301926004358452604081016024358152606082018781526080830189815260a0840190608435825260c085019260a435845260e086019442865261010087019d8e5261012087019960008b528b600052600160205260406000209751885551600188015551600287015560018060a01b03905116600386019060018060a01b03166bffffffffffffffffffffffff60a01b82541617905560018060a01b03905116600485019060018060a01b03166bffffffffffffffffffffffff60a01b8254161790555160058401555160068301555160078201550195511515869060ff801983541691151516179055565b51936002851015610257577f944680b903deffeefdcb36f415b8c3eee48a3b2f9e757ad4114d14987ca6f0fa9160209160009661ff0082549160081b169061ff0019161790558386526002825261023981604088206108c7565b8486526003825261024d81604088206108c7565b604051908152a380f35b634e487b7160e01b600052602160045260246000fd5b634e487b7160e01b600052601160045260246000fd5b600080fd5b34610283576020366003190112610283576001600160a01b036102a961082c565b166000526003602052604060002060405190816020825491828152019160005260206000209060005b8181106102f9576102f5856102e98187038261088d565b604051918291826107e5565b0390f35b82548452602090930192600192830192016102d2565b34610283576000366003190112610283576020600054604051908152f35b3461028357602036600319011261028357600061012060405161034f8161085a565b8281528260208201528260408201528260608201528260808201528260a08201528260c08201528260e0820152826101008201520152600435600052600160205260406000206040516103a18161085a565b815481526001820154916020820192835260028101546040830190815260018060a01b03600383015416916060840192835260018060a01b036004820154169060808501918252600581015460a0860190815260068201549060c08701918252600860078401549360e0890194855201549360ff6101008901958181161515875260081c16966101208901966002891015610257576101409a6104989989526040519a518b525160208b01525160408a015260018060a01b03905116606089015260018060a01b0390511660808801525160a08701525160c08601525160e08501525115156101008401525161012083019061081f565bf35b3461028357602036600319011261028357600435806000526001602052604060002060018060a01b0360038201541633148015610562575b1561052c577fa4eaafe6255a2b6f95a509cf81b72845ef7dd58adb907b52e1bcefba3fd0ff579160ff60086040930161051b8282541615829060ff801983541691151516179055565b5416825191825215156020820152a1005b60405162461bcd60e51b815260206004820152600e60248201526d139bdd08185d5d1a1bdc9a5e995960921b6044820152606490fd5b5060048101546001600160a01b031633146104d2565b346102835760403660031901126102835761059161082c565b6001600160a01b0316600090815260026020526040902080546024359190821015610283576020916105c291610842565b90549060031b1c604051908152f35b34610283576040366003190112610283576105ea61082c565b6001600160a01b0316600090815260036020526040902080546024359190821015610283576020916105c291610842565b34610283576020366003190112610283576001600160a01b0361063c61082c565b166000526002602052604060002060405190816020825491828152019160005260206000209060005b81811061067c576102f5856102e98187038261088d565b8254845260209093019260019283019201610665565b346102835760203660031901126102835760043560005260016020526101406040600020610498815491600181015490600281015460018060a01b0360038301541660018060a01b036004840154166005840154916006850154936008600787015496015496604051998a5260208a015260408901526060880152608087015260a086015260c085015260e084015260ff8116151561010084015260ff61012084019160081c1661081f565b346102835760003660031901126102835760005460001981019081118061026d57610768826108af565b91610776604051938461088d565b808352601f19610785826108af565b013660208501376000825b61026d57818110156107db57600181019081811161026d5784518110156107c55760019160208260051b870101520182610790565b634e487b7160e01b600052603260045260246000fd5b604051806102f586825b602060408183019282815284518094520192019060005b8181106108095750505090565b82518452602093840193909201916001016107fc565b9060028210156102575752565b600435906001600160a01b038216820361028357565b80548210156107c55760005260206000200190600090565b610140810190811067ffffffffffffffff82111761087757604052565b634e487b7160e01b600052604160045260246000fd5b90601f8019910116810190811067ffffffffffffffff82111761087757604052565b67ffffffffffffffff81116108775760051b60200190565b805468010000000000000000811015610877576108e991600182018155610842565b819291549060031b91821b91600019901b191617905556fea26469706673582212209061e9f365bad9ddf9e47887a4d0eba0b442d47ea5457d667e40d31db9565dc364736f6c634300081a0033",
-  "linkReferences": {},
-  "deployedLinkReferences": {}
-}
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "contractId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "AutoPaymentToggled",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "contractId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "company",
+        "type": "address"
+      }
+    ],
+    "name": "ContractConfirmed",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_bidId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_company",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_monthlyPremium",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_contractPeriod",
+        "type": "uint256"
+      }
+    ],
+    "name": "confirmContract",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "contracts",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "bidId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "user",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "company",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "monthlyPremium",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "contractPeriod",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startDate",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "autoPayment",
+        "type": "bool"
+      },
+      {
+        "internalType": "enum FunditContract.ContractStatus",
+        "name": "status",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "contractsByCompany",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "contractsByUser",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllContracts",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_contractId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getContract",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "id",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "proposalId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "bidId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "company",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "monthlyPremium",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "contractPeriod",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "startDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "autoPayment",
+            "type": "bool"
+          },
+          {
+            "internalType": "enum FunditContract.ContractStatus",
+            "name": "status",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct FunditContract.InsuranceContract",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_company",
+        "type": "address"
+      }
+    ],
+    "name": "getContractsByCompany",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_user",
+        "type": "address"
+      }
+    ],
+    "name": "getContractsByUser",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "nextContractId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_contractId",
+        "type": "uint256"
+      }
+    ],
+    "name": "toggleAutoPayment",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

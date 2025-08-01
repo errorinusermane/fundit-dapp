@@ -1,48 +1,68 @@
-import { ethers } from "hardhat";
-import fs from "fs";
-import path from "path";
+// scripts/deploy.ts
 
-// 배포 + ABI 복사 함수
+
+import hardhat from "hardhat";
+import fs from "fs";
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+
+const { ethers, artifacts } = hardhat;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 👀 디버깅 로그
+console.log("👀 Main file loaded.");
+
 async function deployAndSave(
   contractName: string,
   args: any[] = [],
   overrides: object = {}
 ): Promise<string> {
-  const ContractFactory = await ethers.getContractFactory(contractName);
-  const contract = await ContractFactory.deploy(...args, overrides);
-  await contract.waitForDeployment();
+  try {
+    console.log(`🚀 Deploying ${contractName}...`);
 
-  console.log(`✅ ${contractName} deployed to:`, contract.target);
+    const ContractFactory = await ethers.getContractFactory(contractName);
+    const contract = await ContractFactory.deploy(...args, overrides);
+    await contract.waitForDeployment();
 
-  const artifactPath = path.join(
-    __dirname,
-    `../artifacts/contracts/${contractName}.sol/${contractName}.json`
-  );
-  const destPath = path.join(__dirname, `../shared/abi/${contractName}.json`);
-  fs.copyFileSync(artifactPath, destPath);
+    const address = await contract.getAddress();
+    console.log(`✅ ${contractName} deployed to: ${address}`);
 
-  console.log(`✅ ABI copied to shared/abi/${contractName}.json`);
+    const artifact = await artifacts.readArtifact(contractName);
+    const destPath = path.join(__dirname, `../shared/abi/${contractName}.json`);
+    fs.mkdirSync(path.dirname(destPath), { recursive: true });
+    fs.writeFileSync(destPath, JSON.stringify(artifact.abi, null, 2));
+    console.log(`📄 ABI saved to shared/abi/${contractName}.json`);
 
-  return contract.target as string;
+    return address;
+  } catch (error: any) {
+    console.error(`❌ Failed to deploy ${contractName}:`, error.message || error);
+    throw error;
+  }
 }
 
 async function main() {
-  // 1. FunditBid 배포
-  const bidAddress = await deployAndSave("FunditBid");
+  console.log("🔥 Starting deployment...");
 
-  // 2. FunditContract 배포 (현재는 constructor 인자 없음)
-  const contractAddress = await deployAndSave("FunditContract");
+  const deployedAddresses: Record<string, string> = {};
 
-  // 3. FunditProposal 배포
-  const proposalAddress = await deployAndSave("FunditProposal");
+  try {
+    deployedAddresses.FunditBid = await deployAndSave("FunditBid");
+    deployedAddresses.FunditContract = await deployAndSave("FunditContract");
+    deployedAddresses.FunditProposal = await deployAndSave("FunditProposal");
+    deployedAddresses.FunditToken = await deployAndSave("FunditToken");
 
-  // 4. FunditToken 배포
-  const tokenAddress = await deployAndSave("FunditToken");
-
-  // ✅ 필요한 경우 여기서 shared/constants.ts에 address 자동 등록 로직도 추가 가능
+    const constantsPath = path.join(__dirname, "../shared/constants.ts");
+    const constantsContent = `// Auto-generated on ${new Date().toISOString()}
+export const CONTRACT_ADDRESSES = ${JSON.stringify(deployedAddresses, null, 2)};
+`;
+    fs.writeFileSync(constantsPath, constantsContent);
+    console.log(`📦 Contract addresses saved to shared/constants.ts`);
+  } catch (err) {
+    console.error("💥 Deployment script failed.");
+    process.exit(1);
+  }
 }
 
-main().catch((err) => {
-  console.error("❌ Deployment failed:", err);
-  process.exit(1);
-});
+main();
