@@ -1,4 +1,3 @@
-// app/components/LoginModal.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -12,29 +11,37 @@ import {
 } from "react-native";
 import CommonButton from "./CommonButton";
 import AlertMessage from "./AlertMessage";
-import { requestMagicLink } from "@/api/auth";
-import { UserRole } from "@shared/types/user";
+import { connectWallet } from "@/api/auth";
 import { colors, spacing, typography, radius, shadows } from "@/styles";
 
-interface LoginModalProps {
-  role: UserRole;
+interface WalletConnectModalProps {
+  email: string; // verifyMagicToken 이후 받은 이메일
+  role: "user" | "company";
   onClose: () => void;
+  onSuccess?: () => void; // 연결 성공 후 처리 (선택)
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ role, onClose }) => {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
+const WalletConnectModal: React.FC<WalletConnectModalProps> = ({
+  email,
+  role,
+  onClose,
+  onSuccess,
+}) => {
+  const [wallet, setWallet] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSendLink = async () => {
+  const handleConnect = async () => {
     try {
       setLoading(true);
       setErrorMsg("");
-      await requestMagicLink({ email, role });
-      setSent(true);
+      const res = await connectWallet({ email, wallet });
+      globalThis.authToken = res.token;
+      setSuccess(true);
+      onSuccess?.(); // 성공 시 콜백
     } catch (err: any) {
-      setErrorMsg("메일 전송에 실패했습니다. 다시 시도해주세요.");
+      setErrorMsg("지갑 연결에 실패했습니다. 올바른 주소인지 확인하세요.");
     } finally {
       setLoading(false);
     }
@@ -49,31 +56,32 @@ const LoginModal: React.FC<LoginModalProps> = ({ role, onClose }) => {
         >
           <Pressable style={styles.card} onPress={() => {}}>
             <Text style={styles.title}>
-              {role === "user" ? "개인 로그인" : "보험사 로그인"}
+              {role === "user" ? "지갑 주소 연결 (개인)" : "지갑 주소 연결 (보험사)"}
             </Text>
-            <Text style={styles.label}>이메일 입력</Text>
+
+            <Text style={styles.label}>지갑 주소</Text>
             <TextInput
-              placeholder="example@domain.com"
+              placeholder="0x..."
               style={styles.input}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
+              value={wallet}
+              onChangeText={setWallet}
               autoCapitalize="none"
+              autoCorrect={false}
               autoFocus
             />
 
             <CommonButton
-              title="Magic Link 전송"
-              onPress={handleSendLink}
-              role={role}
+              title="지갑 연결"
+              onPress={handleConnect}
               loading={loading}
-              disabled={!email.includes("@")}
+              role={role}
+              disabled={!wallet.startsWith("0x") || wallet.length !== 42}
             />
 
-            {sent && (
+            {success && (
               <AlertMessage
                 type="success"
-                message="이메일이 전송되었습니다. 받은 편지함을 확인해주세요."
+                message="지갑이 성공적으로 연결되었습니다!"
               />
             )}
             {errorMsg !== "" && (
@@ -132,4 +140,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginModal;
+export default WalletConnectModal;

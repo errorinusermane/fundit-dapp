@@ -1,7 +1,8 @@
 // app/navigation/AppNavigator.tsx
-import React, { useEffect, useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { NavigationContainer } from "@react-navigation/native";
+
 import { ProposalListPage } from "@/pages/ProposalListPage";
 import { ProposalDetailPage } from "@/pages/ProposalDetailPage";
 import { BidDetailPage } from "@/pages/BidDetailPage";
@@ -14,7 +15,6 @@ import { RewardsPage } from "@/pages/user/RewardsPage";
 import { MyPage } from "@/pages/MyPage";
 import { LoginPage } from "@/pages/LoginPage";
 import { useUserStore } from "@/store/userStore";
-import LoginModal from "@/components/LoginModal";
 import { Bid } from "@shared/types/bid";
 
 // ✅ 네비게이션 타입 정의
@@ -35,14 +35,7 @@ export type StackParamList = {
 const Stack = createNativeStackNavigator<StackParamList>();
 
 export default function AppNavigator() {
-  const { user, isWalletConnected } = useUserStore();
-  const [isLoginModalVisible, setLoginModalVisible] = useState(false);
-
-  useEffect(() => {
-    if (user && !isWalletConnected) {
-      setLoginModalVisible(true);
-    }
-  }, [user, isWalletConnected]);
+  const { user } = useUserStore();
 
   return (
     <NavigationContainer>
@@ -64,7 +57,6 @@ export default function AppNavigator() {
           </>
         )}
       </Stack.Navigator>
-      {isLoginModalVisible && <LoginModal onClose={() => setLoginModalVisible(false)} />}
     </NavigationContainer>
   );
 }
