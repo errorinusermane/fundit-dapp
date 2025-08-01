@@ -1,0 +1,1 @@
+/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/node_modules/react-native/ReactAndroid/cmake-utils/default-app-setup/CMakeLists.txt

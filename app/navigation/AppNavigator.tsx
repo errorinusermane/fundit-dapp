@@ -16,7 +16,22 @@ import { LoginPage } from "@/pages/LoginPage";
 import { useUserStore } from "@/store/userStore";
 import LoginModal from "@/components/LoginModal";
 
-const Stack = createNativeStackNavigator();
+// ✅ 네비게이션 타입 정의
+export type StackParamList = {
+  Login: undefined;
+  ProposalList: undefined;
+  ProposalDetail: { proposalId: number };
+  BidDetail: { bidId: number };
+  CreateProposal: undefined;
+  SubmitBid: { proposalId: number };
+  MyProposals: undefined;
+  MyBids: undefined;
+  MyContracts: undefined;
+  Rewards: undefined;
+  MyPage: undefined;
+};
+
+const Stack = createNativeStackNavigator<StackParamList>();
 
 export default function AppNavigator() {
   const { user, isWalletConnected } = useUserStore();

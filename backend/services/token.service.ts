@@ -1,6 +1,7 @@
 import { publicClient, walletClient } from "../utils/client";
 import { CONTRACT_ADDRESSES } from "@shared/constants";
 import FunditTokenArtifact from "@shared/abi/FunditToken.json";
+import { RewardHistoryItem } from "@shared/types/token";
 
 import { Address } from "viem";
 import prisma from "@utils/prisma";
@@ -63,7 +64,7 @@ export async function getClaimedReward(address: Address): Promise<bigint> {
 /**
  * ✅ 수령 히스토리 (DB 기반)
  */
-export async function getRewardHistory(address: Address) {
+export async function getRewardHistory(address: Address): Promise<RewardHistoryItem[]> {
   return await prisma.rewardHistory.findMany({
     where: { address },
     orderBy: { createdAt: "desc" },

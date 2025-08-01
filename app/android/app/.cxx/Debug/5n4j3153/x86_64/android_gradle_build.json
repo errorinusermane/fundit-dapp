@@ -1,0 +1,42 @@
+{
+  "buildFiles": [
+    "/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/node_modules/react-native/ReactAndroid/cmake-utils/default-app-setup/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/Users/susie/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/Users/susie/Library/Android/sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "appmodules::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "appmodules",
+      "output": "/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/intermediates/cxx/Debug/5n4j3153/obj/x86_64/libappmodules.so",
+      "runtimeFiles": [
+        "/Users/susie/.gradle/caches/8.14.1/transforms/51dbd9ae21c085b2cb843db84b5d6696/transformed/fbjni-0.7.0/prefab/modules/fbjni/libs/android.x86_64/libfbjni.so",
+        "/Users/susie/.gradle/caches/8.14.1/transforms/5d0a6fceadea979a29a63bd98787fde9/transformed/react-android-0.80.2-debug/prefab/modules/jsi/libs/android.x86_64/libjsi.so",
+        "/Users/susie/.gradle/caches/8.14.1/transforms/5d0a6fceadea979a29a63bd98787fde9/transformed/react-android-0.80.2-debug/prefab/modules/reactnative/libs/android.x86_64/libreactnative.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "/Users/susie/Library/Android/sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang.lld",
+      "cppCompilerExecutable": "/Users/susie/Library/Android/sdk/ndk/27.1.12297006/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++.lld"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

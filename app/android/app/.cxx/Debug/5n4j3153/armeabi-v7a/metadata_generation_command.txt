@@ -1,0 +1,24 @@
+                        -H/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/node_modules/react-native/ReactAndroid/cmake-utils/default-app-setup
+-DCMAKE_SYSTEM_NAME=Android
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+-DCMAKE_SYSTEM_VERSION=24
+-DANDROID_PLATFORM=android-24
+-DANDROID_ABI=armeabi-v7a
+-DCMAKE_ANDROID_ARCH_ABI=armeabi-v7a
+-DANDROID_NDK=/Users/susie/Library/Android/sdk/ndk/27.1.12297006
+-DCMAKE_ANDROID_NDK=/Users/susie/Library/Android/sdk/ndk/27.1.12297006
+-DCMAKE_TOOLCHAIN_FILE=/Users/susie/Library/Android/sdk/ndk/27.1.12297006/build/cmake/android.toolchain.cmake
+-DCMAKE_MAKE_PROGRAM=/Users/susie/Library/Android/sdk/cmake/3.22.1/bin/ninja
+-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/intermediates/cxx/Debug/5n4j3153/obj/armeabi-v7a
+-DCMAKE_RUNTIME_OUTPUT_DIRECTORY=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/intermediates/cxx/Debug/5n4j3153/obj/armeabi-v7a
+-DCMAKE_BUILD_TYPE=Debug
+-DCMAKE_FIND_ROOT_PATH=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/prefab/armeabi-v7a/prefab
+-B/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/armeabi-v7a
+-GNinja
+-DPROJECT_BUILD_DIR=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build
+-DPROJECT_ROOT_DIR=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android
+-DREACT_ANDROID_DIR=/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/node_modules/react-native/ReactAndroid
+-DANDROID_STL=c++_shared
+-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON
+                        Build command args: []
+                        Version: 2

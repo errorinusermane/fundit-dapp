@@ -1,0 +1,18 @@
+# ninja log v5
+1	14	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	1343	1754051819385228170	CMakeFiles/appmodules.dir/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/generated/autolinking/src/main/jni/autolinking.cpp.o	e533bc47e93a6d3a
+2	1457	1754052117766501995	CMakeFiles/appmodules.dir/OnLoad.cpp.o	72c10c6da3e7d774
+1457	1554	1754052117866743005	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/intermediates/cxx/Debug/5n4j3153/obj/x86_64/libappmodules.so	e5af2888b5cdf264
+0	15	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+4	1465	1754052305289203813	CMakeFiles/appmodules.dir/OnLoad.cpp.o	72c10c6da3e7d774
+1466	1551	1754052305383071471	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/build/intermediates/cxx/Debug/5n4j3153/obj/x86_64/libappmodules.so	e5af2888b5cdf264
+0	16	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	13	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+1	23	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	13	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	25	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	44	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	13	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	16	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+1	13	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1
+0	14	0	/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/cmake.verify_globs	2ac8a12925e74ea1

@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { colors, spacing, typography, radius, shadows } from "@/styles";
 
+type ButtonRole = "user" | "company" | "default";
+
 interface CommonButtonProps {
   title: string;
   onPress: () => void;
@@ -15,6 +17,7 @@ interface CommonButtonProps {
   loading?: boolean;
   fullWidth?: boolean;
   style?: ViewStyle;
+  role?: ButtonRole;
 }
 
 const CommonButton: React.FC<CommonButtonProps> = ({
@@ -24,8 +27,14 @@ const CommonButton: React.FC<CommonButtonProps> = ({
   loading = false,
   fullWidth = true,
   style,
+  role = "default",
 }) => {
-  const backgroundColor = disabled ? colors.muted : colors.primary;
+  const getBackgroundColor = () => {
+    if (disabled) return colors.muted;
+    if (role === "company") return colors.primary;
+    if (role === "user") return colors.secondary;
+    return colors.primary;
+  };
 
   return (
     <TouchableOpacity
@@ -34,7 +43,7 @@ const CommonButton: React.FC<CommonButtonProps> = ({
       disabled={disabled || loading}
       style={[
         styles.button,
-        { backgroundColor },
+        { backgroundColor: getBackgroundColor() },
         fullWidth && { alignSelf: "stretch" },
         shadows.soft,
         style,

@@ -1,0 +1,3 @@
+/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/appmodules.dir
+/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/edit_cache.dir
+/Users/susie/Desktop/Temp_Laptop3/Solidity_Files/Yn/fundit-dapp/app/android/app/.cxx/Debug/5n4j3153/x86_64/CMakeFiles/rebuild_cache.dir

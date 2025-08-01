@@ -18,6 +18,9 @@
     },
     "typeRoots": ["../node_modules/@types"],
   },
+  "scripts": {
+    "dev": "ts-node --require tsconfig-paths/register server.ts"
+  },
   "include": ["**/*.ts", "./types/global.d.ts"],
   "exclude": ["dist"]
 }
