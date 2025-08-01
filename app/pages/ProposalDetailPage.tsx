@@ -12,6 +12,7 @@ import { Bid } from "@shared/types/bid";
 import { useUserStore } from "@/store/userStore";
 import CommonButton from "@/components/CommonButton";
 import BidCard from "@/components/BidCard";
+
 import { colors, spacing, typography } from "@/styles";
 
 export function ProposalDetailPage() {
@@ -45,11 +46,39 @@ export function ProposalDetailPage() {
     navigation.navigate("SubmitBid", { proposalId });
   };
 
+  const handleBidPress = (bid: Bid) => {
+    navigation.navigate("BidDetail", { bid }); // ✅ bid 객체 전체 넘김
+  };
+
   if (!proposal) return null;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.inner}>
-      {/* ... 동일 */}
+      <Text style={styles.title}>{proposal.title}</Text>
+      <Text style={styles.description}>{proposal.description}</Text>
+
+      <Section title="Mandatory Requirements" items={proposal.mandatoryRequirements} />
+      <Section title="Enrollment Conditions" items={proposal.enrollmentConditions} />
+      <Section title="Optional Features" items={proposal.optionalFeatures} />
+
+      <View style={styles.metaBox}>
+        <Text style={styles.metaText}>Start Date: {formatDate(proposal.desiredStartDate)}</Text>
+        <Text style={styles.metaText}>
+          Premium Range: {formatPremium(proposal.minPremium)} ~ {formatPremium(proposal.maxPremium)}
+        </Text>
+        <Text style={styles.metaText}>Remaining Time: {proposal.remainingTime} sec</Text>
+        <Text style={styles.metaText}>Bid Count: {proposal.bidCount}</Text>
+      </View>
+
+      <Text style={styles.sectionTitle}>Bids</Text>
+      {bids.length === 0 ? (
+        <Text style={styles.emptyText}>No bids submitted yet.</Text>
+      ) : (
+        bids.map((bid) => (
+          <BidCard key={bid.bidId} bid={bid} onPress={() => handleBidPress(bid)} />
+        ))
+      )}
+
       <CommonButton
         title="Submit Bid"
         role="company"
@@ -128,5 +157,11 @@ const styles = StyleSheet.create({
     fontSize: typography.small,
     color: colors.muted,
     marginBottom: spacing.xs,
+  },
+  emptyText: {
+    fontSize: typography.body,
+    color: colors.muted,
+    textAlign: "center",
+    marginTop: spacing.sm,
   },
 });

@@ -11,6 +11,7 @@ import CommonButton from "./CommonButton";
 
 type Props = {
   bid: Bid;
+  onPress?: () => void; 
   onPressVote?: () => void;
   showButton?: boolean;
   disabled?: boolean;
