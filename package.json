@@ -23,10 +23,16 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@react-navigation/native": "^7.1.16",
     "dotenv": "^17.2.1",
     "ethers": "^6.15.0",
     "react": "^19.1.1",
     "react-native": "^0.80.2",
-    "react-native-dotenv": "^3.4.11"
+    "react-native-dotenv": "^3.4.11",
+    "react-native-gesture-handler": "^2.27.2",
+    "react-native-reanimated": "^4.0.1",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-screens": "^4.13.1",
+    "zustand": "^5.0.7"
   }
 }
