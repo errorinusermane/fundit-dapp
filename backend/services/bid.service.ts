@@ -7,10 +7,10 @@ import { getAllProposals } from "./proposal.service";
 import { Address } from "viem";
 
 const bidContractAddress = CONTRACT_ADDRESSES.FunditBid as `0x${string}`;
-const bidContractAbi = FunditBidArtifact.abi as readonly unknown[];
+const bidContractAbi = FunditBidArtifact as readonly unknown[];
 
 const contractContractAddress = CONTRACT_ADDRESSES.FunditContract as `0x${string}`;
-const contractContractAbi = FunditContractArtifact.abi as readonly unknown[];
+const contractContractAbi = FunditContractArtifact as readonly unknown[];
 
 // 🔒 getBid() 호출 시 반환되는 Solidity 구조를 명시적으로 정의
 type RawBid = {

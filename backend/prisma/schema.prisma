@@ -8,16 +8,16 @@ datasource db {
 }
 
 model User {
-  id          String    @id // 지갑 주소 (0x...)
-  email       String    @unique
+  email       String    @id
+  wallet      String?   @unique
   role        Role
   createdAt   DateTime  @default(now())
   lastLoginAt DateTime? @updatedAt
 
-  proposals Proposal[]      @relation("UserProposals")
-  bids      Bid[]           @relation("UserBids")
-  contracts Contract[]      @relation("UserContracts")
-  companyAs Contract[]      @relation("CompanyContracts")
+  proposals Proposal[] @relation("UserProposals")
+  bids      Bid[]      @relation("UserBids")
+  contracts Contract[] @relation("UserContracts")
+  companyAs Contract[] @relation("CompanyContracts")
 }
 
 enum Role {
@@ -46,7 +46,7 @@ model Proposal {
   status                ProposalStatus
   bidCount              Int            @default(0)
 
-  user User  @relation("UserProposals", fields: [proposer], references: [id])
+  user User  @relation("UserProposals", fields: [proposer], references: [wallet])
   bids Bid[]
 }
 
@@ -77,7 +77,7 @@ model Bid {
   createdAt                  DateTime  @default(now())
 
   proposal Proposal @relation(fields: [proposalId], references: [id])
-  user     User     @relation("UserBids", fields: [company], references: [id])
+  user     User     @relation("UserBids", fields: [company], references: [wallet])
 
   @@index([proposalId])
   @@index([company])
@@ -100,8 +100,8 @@ model Contract {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  user    User @relation("UserContracts", fields: [userAddress], references: [id])
-  company User @relation("CompanyContracts", fields: [companyAddress], references: [id])
+  user    User @relation("UserContracts", fields: [userAddress], references: [wallet])
+  company User @relation("CompanyContracts", fields: [companyAddress], references: [wallet])
 
   @@index([userAddress])
   @@index([companyAddress])

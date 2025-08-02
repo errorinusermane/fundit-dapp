@@ -7,7 +7,7 @@ import { Address } from "viem";
 import prisma from "@utils/prisma";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditToken as `0x${string}`;
-const contractAbi = FunditTokenArtifact.abi as readonly unknown[];
+const contractAbi = FunditTokenArtifact as readonly unknown[];
 
 /**
  * ✅ 리워드 수령 (관리자만 호출 + DB 기록)

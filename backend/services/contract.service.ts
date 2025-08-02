@@ -4,7 +4,7 @@ import FunditContractArtifact from "@shared/abi/FunditContract.json";
 import { ContractStatus, FunditContract } from "@shared/types/contract";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditContract as `0x${string}`;
-const contractAbi = FunditContractArtifact.abi as readonly unknown[];
+const contractAbi = FunditContractArtifact as readonly unknown[];
 
 /**
  * 계약 확정 → confirmContract

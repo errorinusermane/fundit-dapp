@@ -6,7 +6,7 @@ import { parseAbiItem } from "viem";
 import { Address, parseAbi } from "viem";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditProposal as `0x${string}`;
-const contractAbi = FunditProposalArtifact.abi as readonly unknown[];
+const contractAbi = FunditProposalArtifact as readonly unknown[];
 
 /**
  * Proposal 생성 (온체인)

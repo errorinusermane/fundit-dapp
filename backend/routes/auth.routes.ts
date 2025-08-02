@@ -31,8 +31,48 @@ router.post("/login", async (req, res) => {
 });
 
 /**
+ * POST /auth/verify
+ * Body에 토큰을 담아 인증 (유저 생성 + 최종 JWT 발급)
+ */
+router.post("/verify", async (req, res) => {
+  const { token } = req.body;
+
+  if (!token || typeof token !== "string") {
+    return res.status(400).json({ error: "Token이 필요합니다." });
+  }
+
+  try {
+    const result = await verifyMagicToken(token);
+
+    if (!result.walletConnected) {
+      return res.status(200).json({
+        message: "✅ 인증 성공 (지갑 미연결)",
+        user: {
+          email: result.email,
+          role: result.role,
+          wallet: "", // 미연결 시 빈 문자열로 처리
+        },
+      });
+    }
+
+    res.status(200).json({
+      message: "✅ 인증 성공",
+      token: result.token,
+      user: {
+        email: result.email,
+        role: result.role,
+        wallet: result.wallet,
+      },
+    });
+  } catch (err) {
+    console.error("❌ Token verification failed (POST):", err);
+    res.status(401).json({ error: "Invalid or expired token." });
+  }
+});
+
+/**
  * GET /auth/verify?token=...
- * magic link를 통한 토큰 검증 → user 정보 + 최종 JWT 발급
+ * magic link를 통한 토큰 검증 → 지갑 연결 여부 판단 후 토큰 발급
  */
 router.get("/verify", async (req, res) => {
   const { token } = req.query;
@@ -43,14 +83,25 @@ router.get("/verify", async (req, res) => {
 
   try {
     const result = await verifyMagicToken(token);
-    res.status(200).json({
-      message: "✅ 인증 성공",
+
+    if (!result.walletConnected) {
+      return res.status(200).json({
+        walletConnected: false,
+        email: result.email,
+        role: result.role,
+        message: "지갑이 연결되지 않았습니다.",
+      });
+    }
+
+    return res.status(200).json({
+      walletConnected: true,
       token: result.token,
       user: {
         email: result.email,
         role: result.role,
         wallet: result.wallet,
       },
+      message: "✅ 인증 성공",
     });
   } catch (err) {
     console.error("❌ Token verification failed:", err);
@@ -70,22 +121,12 @@ router.patch("/wallet", async (req, res) => {
   }
 
   try {
-    const updated = await connectWallet(email, wallet);
-
-    const newToken = generateToken({
-      email: updated.email,
-      role: updated.role as UserRole,
-      wallet: updated.id,
-    });
+    const result = await connectWallet(email, wallet);
 
     res.status(200).json({
       message: "✅ Wallet 연결 완료",
-      token: newToken,
-      user: {
-        email: updated.email,
-        role: updated.role,
-        wallet: updated.id,
-      },
+      token: result.token,
+      user: result.user,
     });
   } catch (err) {
     console.error("❌ Wallet 연결 실패:", err);
