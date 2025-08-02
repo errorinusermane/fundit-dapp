@@ -3,15 +3,11 @@ import { FunditContract } from "@shared/types/contract";
 
 interface ConfirmContractInput {
   proposalId: number;
-  bidId: number;
-  user: string;     // 유저 지갑 주소
-  company: string;  // 기업 지갑 주소
-  monthlyPremium: bigint;  // 단위: wei
-  contractPeriod: number;  // 단위: 월
+  user: string; // 유저 지갑 주소
 }
 
 /**
- * 계약 확정 (입찰 채택 → 계약 생성)
+ * 계약 확정 (가장 많은 투표를 받은 Bid로 자동 체결)
  */
 export async function confirmContract(input: ConfirmContractInput): Promise<string> {
   const res = await axiosInstance.post("/contracts/confirm", input);
