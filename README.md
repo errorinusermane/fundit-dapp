@@ -71,3 +71,10 @@ fundit-dapp/
 ├── tsconfig.json
 ├── hardhat.config.js
 └── README.md
+
+ipconfig getifaddr en0
+
+export PATH=/opt/homebrew/bin:$PATH
+source ~/.zshrc
+
+psql -h 127.0.0.1 -U fundituser -d fundit

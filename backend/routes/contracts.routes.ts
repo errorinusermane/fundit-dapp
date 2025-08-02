@@ -6,6 +6,8 @@ import {
   getContractDetail,
   toggleAutoPayment,
 } from "../services/contract.service";
+import { getProposalById } from "services/proposal.service";
+import { getBidsByProposal } from "services/bid.service";
 
 const router = express.Router();
 
@@ -15,25 +17,35 @@ const router = express.Router();
  */
 router.post("/confirm", async (req, res) => {
   try {
-    const {
-      proposalId,
-      bidId,
-      user,
-      company,
-      monthlyPremium,
-      contractPeriod,
-    } = req.body;
+    const { proposalId, user } = req.body;
 
+    // 1. 제안 정보 조회
+    const proposal = await getProposalById(proposalId);
+    const now = Date.now();
+    if (now < new Date(proposal.desiredStartDate).getTime()) {
+      return res.status(400).json({ error: "Proposal has not started yet" });
+    }
+
+    // 2. 입찰 목록: 최다 투표 선택
+    const bids = await getBidsByProposal(proposalId);
+    if (bids.length === 0) return res.status(404).json({ error: "No bids found" });
+
+    const winning = bids.reduce((a, b) => (a.voteCount > b.voteCount ? a : b));
+    if (winning.voteCount < winning.minVotes) {
+      return res.status(400).json({ error: "Not enough votes to confirm contract" });
+    }
+
+    // 3. 계약 체결
     const tx = await confirmContract({
       proposalId,
-      bidId,
+      bidId: winning.bidId,
       user,
-      company,
-      monthlyPremium: BigInt(monthlyPremium),
-      contractPeriod,
+      company: winning.company,
+      monthlyPremium: BigInt(winning.monthlyPremium),
+      contractPeriod: winning.contractPeriod,
     });
 
-    res.status(200).json({ txHash: tx });
+    res.status(200).json({ txHash: tx, selectedBidId: winning.bidId });
   } catch (err) {
     console.error("❌ Failed to confirm contract:", err);
     res.status(500).json({ error: "Failed to confirm contract." });
