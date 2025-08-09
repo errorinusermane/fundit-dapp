@@ -75,15 +75,12 @@ fundit-dapp/
 # ip 확인
 ipconfig getifaddr en0
 
-# 기본 환경변수 설정
-export PATH=/opt/homebrew/bin:$PATH
-source ~/.zshrc
-
 # 백엔드 DB 접속
 psql -h 127.0.0.1 -U fundituser -d fundit
 npx prisma migrate dev
 
 # 백엔드 실행
+cd backend
 pnpm dev
 
 # AWS 배포 시
