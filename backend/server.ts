@@ -33,6 +33,7 @@ app.use("/token", tokenRouter);
 app.use("/auth", authRouter);
 
 // ✅ 서버 시작
-app.listen(3001, "0.0.0.0", () => {
-  console.log("✅ Backend running on http://0.0.0.0:3001");
+const PORT = Number(process.env.PORT) || 8080;
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
 });

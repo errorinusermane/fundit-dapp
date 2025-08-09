@@ -1,7 +1,7 @@
 import { publicClient, walletClient } from "../utils/client";
-import { CONTRACT_ADDRESSES } from "@shared/constants";
-import FunditContractArtifact from "@shared/abi/FunditContract.json";
-import { ContractStatus, FunditContract } from "@shared/types/contract";
+import { CONTRACT_ADDRESSES } from "../../shared/constants";
+import FunditContractArtifact from "../../shared/abi/FunditContract.json";
+import { ContractStatus, FunditContract } from "../../shared/types/contract";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditContract as `0x${string}`;
 const contractAbi = FunditContractArtifact as readonly unknown[];

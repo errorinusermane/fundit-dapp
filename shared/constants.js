@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CONTRACT_ADDRESSES = void 0;
+// Auto-generated on 2025-08-01T23:15:13.825Z
+exports.CONTRACT_ADDRESSES = {
+    "FunditBid": "0x75B7d416f3Db2236c010a1db179C9B0118845985",
+    "FunditContract": "0x48a685bd44A471750204E953c7103b8da479c8E8",
+    "FunditProposal": "0xf523b31BeFB90554a64C3DB6ad025a15639a3B5E",
+    "FunditToken": "0x83d0404b9C3e6Be2D851c953D469B99F3A6f9C0A"
+};

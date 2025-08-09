@@ -85,3 +85,15 @@ npx prisma migrate dev
 
 # 백엔드 실행
 pnpm dev
+
+# AWS 배포 시
+pnpm build
+ls dist
+pnpm start
+
+zip -r backend-deploy.zip \
+  dist \
+  prisma \
+  package.json \
+  pnpm-lock.yaml \
+  .env
