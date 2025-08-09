@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config(); // .env에서 JWT_SECRET 로드
 
 const JWT_SECRET = process.env.JWT_SECRET!;
-const JWT_EXPIRES_IN = "15m"; // 토큰 유효기간 (magic link 포함)
+const JWT_EXPIRES_IN = "7d"; // 토큰 유효기간 (magic link 포함)
 
 // 역할 타입
 export type UserRole = "user" | "company";
