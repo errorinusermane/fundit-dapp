@@ -75,8 +75,11 @@ router.post("/verify", async (req, res) => {
  * magic link를 통한 토큰 검증 → 지갑 연결 여부 판단 후 토큰 발급
  */
 router.get("/verify", async (req, res) => {
-  const { token } = req.query;
-
+  const authHeader = req.headers.authorization;
+  const token = typeof authHeader === "string" 
+    ? authHeader.replace(/^Bearer\s/, "") 
+    : null;
+  
   if (!token || typeof token !== "string") {
     return res.status(400).json({ error: "Token이 필요합니다." });
   }
