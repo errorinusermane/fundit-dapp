@@ -88,9 +88,9 @@ pnpm build
 ls dist
 pnpm start
 
-zip -r backend-deploy.zip \
+zip -r ../backend-deploy.zip \
   dist \
   prisma \
   package.json \
   pnpm-lock.yaml \
-  .env
+  .ebextensions

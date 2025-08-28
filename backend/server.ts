@@ -16,6 +16,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+
+// ✅ Health check + 기본 root 응답
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "🚀 Fundit API is running" });
+});
+
 // ✅ 모든 요청에 대해 인증 + wallet 연결 확인
 app.use((req, res, next) => {
   if (req.path.startsWith("/auth")) return next(); // 🔓 인증 제외 경로
@@ -33,7 +39,7 @@ app.use("/token", tokenRouter);
 app.use("/auth", authRouter);
 
 // ✅ 서버 시작
-const PORT = Number(process.env.PORT) || 8080;
+const PORT = Number(process.env.PORT) || 5000;
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
 });
