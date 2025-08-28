@@ -1,14 +1,3 @@
-process.on("exit", (code) => {
-  console.log("⚡ Process exiting with code:", code);
-});
-process.on("SIGINT", () => {
-  console.log("⚡ SIGINT received");
-});
-process.on("SIGTERM", () => {
-  console.log("⚡ SIGTERM received");
-});
-
-
 import express from "express";
 import cors from "cors";
 import path from "path";
