@@ -1,8 +1,8 @@
 import { publicClient, walletClient } from "../utils/client";
-import { CONTRACT_ADDRESSES } from "../../shared/constants";
-import FunditBidArtifact from "../../shared/abi/FunditBid.json";
-import FunditContractArtifact from "../../shared/abi/FunditContract.json";
-import { Bid } from "../../shared/types/bid";
+import { CONTRACT_ADDRESSES } from "../shared/constants";
+import FunditBidArtifact from "../shared/abi/FunditBid.json";
+import FunditContractArtifact from "../shared/abi/FunditContract.json";
+import { Bid } from "../shared/types/bid";
 import { Address } from "viem";
 
 const bidContractAddress = CONTRACT_ADDRESSES.FunditBid as `0x${string}`;

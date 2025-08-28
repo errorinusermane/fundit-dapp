@@ -1,10 +1,10 @@
 import { publicClient, walletClient } from "../utils/client";
-import { CONTRACT_ADDRESSES } from "../../shared/constants";
-import FunditTokenArtifact from "../../shared/abi/FunditToken.json";
-import { RewardHistoryItem } from "../../shared/types/token";
+import { CONTRACT_ADDRESSES } from "../shared/constants";
+import FunditTokenArtifact from "../shared/abi/FunditToken.json";
+import { RewardHistoryItem } from "../shared/types/token";
 
 import { Address } from "viem";
-import prisma from "@utils/prisma";
+import prisma from "../utils/prisma";
 
 const contractAddress = CONTRACT_ADDRESSES.FunditToken as `0x${string}`;
 const contractAbi = FunditTokenArtifact as readonly unknown[];

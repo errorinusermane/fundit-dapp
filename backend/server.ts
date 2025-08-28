@@ -1,7 +1,18 @@
+process.on("exit", (code) => {
+  console.log("⚡ Process exiting with code:", code);
+});
+process.on("SIGINT", () => {
+  console.log("⚡ SIGINT received");
+});
+process.on("SIGTERM", () => {
+  console.log("⚡ SIGTERM received");
+});
+
+
 import express from "express";
 import cors from "cors";
 import path from "path";
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+require("dotenv").config({ path: path.resolve(__dirname, ".env") });
 
 import proposalsRouter from "./routes/proposals.routes";
 import bidsRouter from "./routes/bids.routes";
@@ -34,6 +45,14 @@ app.use("/auth", authRouter);
 
 // ✅ 서버 시작
 const PORT = Number(process.env.PORT) || 5000;
-app.listen(PORT, "0.0.0.0", () => {
+// app.listen(PORT, "0.0.0.0", () => {
+//   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+// });
+
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`✅ Server running on http://0.0.0.0:${PORT}`);
+});
+
+server.on("close", () => {
+  console.log("❌ Server closed");
 });

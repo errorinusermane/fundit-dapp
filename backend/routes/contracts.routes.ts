@@ -6,8 +6,8 @@ import {
   getContractDetail,
   toggleAutoPayment,
 } from "../services/contract.service";
-import { getProposalById } from "services/proposal.service";
-import { getBidsByProposal } from "services/bid.service";
+import { getProposalById } from "../services/proposal.service";
+import { getBidsByProposal } from "../services/bid.service";
 
 const router = express.Router();
 

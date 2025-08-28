@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as dotenv from "dotenv";
-dotenv.config({ path: path.resolve(__dirname, "../../.env") }); // 루트 기준 경로 조심!
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";

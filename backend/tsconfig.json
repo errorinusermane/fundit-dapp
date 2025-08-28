@@ -2,8 +2,8 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "outDir": "../dist/backend",
-    "rootDir": "..",
+    "outDir": "./dist",       // 👉 backend 안에 dist 생성
+    "rootDir": "./",          // 👉 backend 내부만 빌드 대상으로
     "module": "commonjs",
     "target": "ES2020",
     "lib": ["ES2020"],
@@ -14,11 +14,11 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["../shared/*"],
+      "@shared/*": ["shared/*"],
       "@utils/*": ["./utils/*"]
     },
     "typeRoots": ["../node_modules/@types"]
   },
   "include": ["./**/*.ts", "./types/global.d.ts"],
-  "exclude": ["../dist"]
+  "exclude": ["./dist"]
 }

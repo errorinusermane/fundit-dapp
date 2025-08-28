@@ -4,13 +4,12 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["app/*"],
-      "@shared/*": ["shared/*"],
+      "@shared/*": ["backend/shared/*"],
       "@utils/*": ["backend/utils/*"]
     }
   },
   "include": [],
   "references": [
-    { "path": "./backend" },
-    { "path": "./app" }
+    { "path": "./backend" }
   ]
 }

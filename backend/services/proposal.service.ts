@@ -1,7 +1,7 @@
 import { publicClient, walletClient } from "../utils/client";
-import { CONTRACT_ADDRESSES } from "../../shared/constants";
-import FunditProposalArtifact from "../../shared/abi/FunditProposal.json";
-import { Proposal, ProposalStatus } from "../../shared/types/proposal";
+import { CONTRACT_ADDRESSES } from "../shared/constants";
+import FunditProposalArtifact from "../shared/abi/FunditProposal.json";
+import { Proposal, ProposalStatus } from "../shared/types/proposal";
 import { parseAbiItem } from "viem";
 import { Address, parseAbi } from "viem";
 
