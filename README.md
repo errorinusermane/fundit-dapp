@@ -81,16 +81,11 @@ npx prisma migrate dev
 
 # 백엔드 실행
 cd backend
-pnpm dev
+npm run dev
 
 # AWS 배포 시
-pnpm build
-ls dist
-pnpm start
+npm run build
+npm start
 
-zip -r ../backend-deploy.zip \
-  dist \
-  prisma \
-  package.json \
-  pnpm-lock.yaml \
-  .ebextensions
+rm -rf node_modules
+zip -r deploy/backend-deploy-v8.zip dist prisma package.json package-lock.json .ebextensions
