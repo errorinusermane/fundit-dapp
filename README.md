@@ -77,6 +77,10 @@ ipconfig getifaddr en0
 
 # 백엔드 DB 접속
 psql -h 127.0.0.1 -U fundituser -d fundit
+# 로컬 env: DATABASE_URL: "postgresql://fundituser:funditpass@localhost:5432/fundit"
+# 배포 env: DATABASE_URL: "postgresql://postgres:funditpass@fundit-db.cjw40k4kwb6e.ap-northeast-2.rds.amazonaws.com:5432/fundit?schema=public"
+# aws에서는 fundituser, funditpass
+# psql -h fundit-db.cjw40k4kwb6e.ap-northeast-2.rds.amazonaws.com -U postgres -p 5432
 npx prisma migrate dev
 
 # 백엔드 실행
@@ -88,4 +92,5 @@ npm run build
 npm start
 
 rm -rf node_modules
-zip -r deploy/backend-deploy-v8.zip dist prisma package.json package-lock.json .ebextensions
+zip -r deploy/backend-deploy-v13.zip dist prisma package.json package-lock.json .ebextensions
+npm install
